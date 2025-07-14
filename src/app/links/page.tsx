@@ -5,85 +5,44 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
   ExternalLink, 
-  Github, 
   Instagram, 
-  Music, 
   Video, 
-  Mail,
   Twitter,
   Youtube,
-  Smartphone,
-  Package,
-  Zap
+  BookOpen
 } from "lucide-react";
 
 const links = [
   {
-    title: "Latest Content",
-    url: "https://tiktok.com/@julianisdoing",
-    icon: Video,
-    description: "Daily updates on building, creating, and learning",
+    title: "Journaling App",
+    url: "https://www.vibecodeapp.com/projects/4e7ea1de-ea55-4092-acc9-02942341757a",
+    icon: BookOpen,
+    description: "My latest project - check it out!",
     featured: true
   },
   {
     title: "TikTok",
-    url: "https://tiktok.com/@julianisdoing", 
+    url: "https://www.tiktok.com/@julianisdoing", 
     icon: Video,
-    description: "Building apps, learning music, documenting the journey"
+    description: "Daily updates on building, creating, and learning"
   },
   {
     title: "Instagram",
-    url: "https://instagram.com/julianisdoing",
+    url: "https://www.instagram.com/julianisdoing.mp4/",
     icon: Instagram,
     description: "Behind the scenes and visual updates"
   },
   {
     title: "YouTube",
-    url: "https://youtube.com/@julianisdoing",
+    url: "https://www.youtube.com/@JulianIsDoing",
     icon: Youtube,
     description: "Longer form content and tutorials"
   },
   {
-    title: "Twitter/X",
+    title: "X (Twitter)",
     url: "https://x.com/julianisdoing",
     icon: Twitter,
     description: "Real-time thoughts and quick updates"
-  },
-  {
-    title: "Content OS App",
-    url: "#",
-    icon: Smartphone,
-    description: "The app I'm building for content creators"
-  },
-  {
-    title: "Music Production",
-    url: "#",
-    icon: Music,
-    description: "Learning beats and music creation"
-  },
-  {
-    title: "Physical Product Journey",
-    url: "#",
-    icon: Package,
-    description: "Manufacturing and product development"
-  },
-  {
-    title: "GitHub Projects",
-    url: "https://github.com/julianships",
-    icon: Github,
-    description: "Code, projects, and open source work"
-  },
-  {
-    title: "AI Tools Stack",
-    url: "#",
-    icon: Zap,
-    description: "The AI tools I use to build without coding"
-  },
-  {
-    title: "Contact",
-    url: "mailto:julian@julianisdoing.com",
-    icon: Mail,
-    description: "Get in touch for collaborations"
   }
 ];
 
@@ -154,13 +113,7 @@ export default function LinksPage() {
                 className={`w-full justify-start p-4 h-auto group relative overflow-hidden ${
                   link.featured ? "shadow-glow" : ""
                 }`}
-                onClick={() => {
-                  if (link.url.startsWith('mailto:')) {
-                    window.location.href = link.url;
-                  } else {
-                    window.open(link.url, '_blank');
-                  }
-                }}
+                onClick={() => window.open(link.url, '_blank')}
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className={`p-2 rounded-lg ${
