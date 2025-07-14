@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { 
   ExternalLink, 
   Instagram, 
@@ -77,9 +78,16 @@ export default function LinksPage() {
           transition={{ duration: 0.6 }}
           className="text-center space-y-4"
         >
-          {/* Profile placeholder */}
-          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-accent/20 to-accent/5 rounded-full flex items-center justify-center border border-border/50">
-            <div className="text-2xl">👨‍💻</div>
+          {/* Profile picture */}
+          <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-accent/30">
+            <Image
+              src="/profile.jpg"
+              alt="Julian's profile picture"
+              width={96}
+              height={96}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           
           <div className="space-y-2">
