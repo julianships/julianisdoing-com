@@ -1,0 +1,237 @@
+# Product Requirements Document (PRD)
+## "Julian is doing.com" Personal Website
+
+### 1. Project Overview
+
+**Product Name:** Julian is doing.com  
+**Product Type:** Personal brand website with custom link management  
+**Target Audience:** Content creators, builders, entrepreneurs, and followers of Julian's journey  
+**Brand Position:** "The Intentional Architect" - A builder documenting the journey of creating an intentional life
+
+### 2. Core Brand Identity
+
+**Mission Statement:** To document the journey of building an intentional life, sharing authentic lessons on tech, creativity, and mindset to empower others to overcome opportunity paralysis.
+
+**Core Values:**
+- **Authenticity:** Unfiltered journey sharing - wins, struggles, breakthroughs
+- **Action over Perfection:** Prioritizing doing and learning over waiting for perfect plans
+- **Intentionality:** Deliberately curating focus, energy, and experiences
+- **Resilience:** Viewing failure as valuable data points for growth
+
+**Brand Voice:** Inspiring, Educational, Authentic, Confident, Empathetic
+
+### 3. Design Requirements
+
+**Visual Identity:**
+- **Color Scheme:** Dark and sleek theme with modern aesthetics
+- **Typography:** Clean, modern fonts that convey professionalism and approachability
+- **Layout:** Minimalist, intentional design that reduces cognitive load
+- **Imagery:** High-quality photos from Julian's environment (South of France, studio setup, lifestyle shots)
+
+**User Experience Principles:**
+- Fast loading times
+- Mobile-first responsive design
+- Intuitive navigation
+- Accessibility compliance (WCAG 2.1 AA)
+- SEO optimized
+
+### 4. Homepage Requirements
+
+#### 4.1 Hero Section
+- **Primary Headline:** "Julian is doing [something]" - Dynamic text that cycles through current projects
+- **Subheadline:** "The Intentional Architect - Building apps, creating content, and documenting the journey of intentional living"
+- **Visual:** High-quality hero image or video loop showcasing Julian's workspace/environment
+- **Call-to-Action:** "Follow the Journey" button linking to daily content
+
+#### 4.2 About Section
+- **Content:** Personal story highlighting:
+  - Non-developer building apps with AI tools
+  - Daily content creation journey
+  - Location: South of France
+  - Philosophy: "You can just do things"
+- **Visual:** Personal photo or video snippet
+- **Stats:** Current follower count, days of consecutive posting, projects completed
+
+#### 4.3 Daily Updates Section
+- **Title:** "What Julian is doing today"
+- **Content:** 
+  - Latest video/content embed from TikTok
+  - Brief text update on current projects
+  - "Day X" counter showing consecutive posting streak
+- **Visual:** Latest content thumbnail or preview
+- **CTA:** Links to full social media profiles
+
+#### 4.4 Current Projects Showcase
+Display cards for active projects:
+1. **Content Creation OS App** - Software project being built in public
+2. **Physical Product Business** - Manufacturing/packaging design journey
+3. **Music Production** - Learning journey with Novation Launchkey
+4. **Daily Content Creation** - Meta-narrative of creator journey
+
+Each card includes:
+- Project title and brief description
+- Progress indicator or milestone
+- Link to detailed project updates
+- Visual representation
+
+#### 4.5 Philosophy Section
+- **Core Philosophies:** 
+  - "Beginner's Mind" - Joy of learning from zero
+  - "Doing Hard Things" - Voluntary difficulty breeds satisfaction
+  - "Non-Developer Builder" - AI tools enabling non-technical creation
+  - "Intentional Curation" - Choosing focus in infinite choice world
+
+### 5. "/links" Directory Requirements
+
+#### 5.1 Custom Linktree Alternative
+**URL Structure:** `julianisdoing.com/links`
+
+**Page Layout:**
+- **Header:** Julian's profile photo, name, and tagline
+- **Bio:** "You can just do things - Posting a new video everyday and becoming my best self"
+- **Link Categories:**
+
+#### 5.2 Link Categories Structure
+
+**Social Media Links:**
+- TikTok (@julianisdoing) - Primary platform
+- Instagram
+- YouTube
+- Twitter/X
+- LinkedIn
+
+**Project Links:**
+- Content OS App (GitHub/Demo)
+- Physical Product Updates
+- Music Production Demos
+- Portfolio/Work Examples
+
+**Content Links:**
+- Latest Video
+- Blog Posts (if applicable)
+- Podcast Appearances
+- Press/Media
+
+**Professional Links:**
+- Resume/CV
+- Contact Information
+- Speaking Requests
+- Collaboration Inquiries
+
+**Resource Links:**
+- AI Tools Stack
+- Recommended Resources
+- Affiliate Links (if applicable)
+- Newsletter Signup
+
+#### 5.3 Link Management Features
+- **Admin Panel:** Easy link editing and reordering
+- **Analytics:** Click tracking and performance metrics
+- **Custom URLs:** Branded short links
+- **Scheduling:** Ability to schedule link activation/deactivation
+- **Categories:** Organize links by type/project
+- **Priority System:** Featured links at top
+
+### 6. Technical Requirements
+
+#### 6.1 Core Technology Stack
+- **Frontend:** React/Next.js for modern, fast loading
+- **Styling:** Tailwind CSS for responsive design
+- **Database:** PostgreSQL for link management
+- **Hosting:** Vercel/Netlify for fast deployment
+- **Domain:** julianisdoing.com (already owned)
+
+#### 6.2 Performance Requirements
+- **Page Load Time:** <2 seconds on 3G connection
+- **Mobile Optimization:** 100% responsive design
+- **SEO:** Structured data, meta tags, sitemap
+- **Analytics:** Google Analytics 4 integration
+
+#### 6.3 Content Management
+- **CMS:** Headless CMS (Strapi/Contentful) for easy updates
+- **Image Optimization:** Automatic compression and WebP conversion
+- **Video Integration:** Embedded players for TikTok/YouTube content
+- **Real-time Updates:** WebSocket connection for live project status
+
+### 7. Content Strategy Integration
+
+#### 7.1 Daily Content Integration
+- **Auto-sync:** Automatically pull latest content from social platforms
+- **Content Calendar:** Display upcoming content themes
+- **Engagement Stats:** Show performance metrics of recent content
+
+#### 7.2 SEO Strategy
+- **Primary Keywords:** "Julian Albou", "building in public", "non-developer", "AI tools", "intentional living"
+- **Content Optimization:** Blog posts about journey milestones
+- **Schema Markup:** Person and Organization structured data
+
+### 8. Future Enhancements (Phase 2)
+
+#### 8.1 Community Features
+- **Newsletter:** Email updates on projects and learnings
+- **Comments:** Engagement on project updates
+- **Community Forum:** "You can just do things" community space
+
+#### 8.2 Advanced Features
+- **Project Dashboard:** Real-time project tracking
+- **Resource Library:** Curated tools and resources
+- **Course/Workshop Pages:** If educational content is created
+- **Merchandise Integration:** For physical product business
+
+### 9. Success Metrics
+
+#### 9.1 User Engagement
+- **Page Views:** Monthly unique visitors
+- **Time on Site:** Average session duration
+- **Click-through Rate:** Links page performance
+- **Social Shares:** Content virality metrics
+
+#### 9.2 Brand Growth
+- **Follower Growth:** Cross-platform audience increase
+- **Project Engagement:** Community involvement in projects
+- **Professional Opportunities:** Speaking/collaboration requests
+- **SEO Rankings:** Visibility for target keywords
+
+### 10. Launch Timeline
+
+**Phase 1: MVP (4-6 weeks)**
+- Homepage with core sections
+- /links directory with basic functionality
+- Mobile responsive design
+- Basic analytics
+
+**Phase 2: Enhancement (2-4 weeks)**
+- Advanced link management features
+- Content auto-sync
+- Performance optimization
+- SEO implementation
+
+**Phase 3: Community (4-6 weeks)**
+- Newsletter integration
+- Community features
+- Advanced analytics
+- Additional pages as needed
+
+### 11. Risk Assessment
+
+**Technical Risks:**
+- Social media API changes affecting content sync
+- Performance issues with embedded content
+- SEO competition for personal branding keywords
+
+**Content Risks:**
+- Maintaining daily update consistency
+- Balancing personal brand with professional opportunities
+- Content platform algorithm changes
+
+**Mitigation Strategies:**
+- Fallback content systems
+- Multiple platform diversification
+- Regular performance monitoring
+- Content backup and archival systems
+
+---
+
+**Document Version:** 1.0  
+**Last Updated:** [Current Date]  
+**Next Review:** [30 days from creation] 
