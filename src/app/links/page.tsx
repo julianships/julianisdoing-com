@@ -14,8 +14,6 @@ import {
   Youtube,
   Smartphone,
   Package,
-  Calendar,
-  BookOpen,
   Zap
 } from "lucide-react";
 
