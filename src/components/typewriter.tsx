@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 
 // Calculate days since starting date
 function getDaysSinceStart() {
-  // Starting date - set to make today day 39 (38 days ago + today = 39)
+  // Starting date - set to make today day 40 (39 days ago + today = 40)
   const today = new Date();
   const startDate = new Date(today);
-  startDate.setDate(today.getDate() - 38); // 38 days ago makes today day 39
+  startDate.setDate(today.getDate() - 39); // 39 days ago makes today day 40
   
   const diffTime = Math.abs(today.getTime() - startDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
@@ -19,7 +19,7 @@ export function Typewriter() {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
-  const [dayCount, setDayCount] = useState(39);
+  const [dayCount, setDayCount] = useState(40);
 
   // Update day count on component mount
   useEffect(() => {
