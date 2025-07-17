@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 // Calculate days since Julian's journey started
 function getDaysSinceStart() {
-  // Julian's journey start date (Day 1 was October 21, 2024)
-  // Month is 0-indexed in JS, so 9 is October.
-  const journeyStartDate = new Date(2024, 9, 21);
+  // Julian's journey start date (Day 1 was June 6, 2025)
+  // Month is 0-indexed in JS, so 5 is June.
+  const journeyStartDate = new Date(2025, 5, 6);
   const today = new Date();
   
   // Reset both dates to midnight to avoid timezone issues
@@ -15,7 +15,7 @@ function getDaysSinceStart() {
   today.setHours(0, 0, 0, 0);
   
   const diffTime = today.getTime() - journeyStartDate.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 because Oct 21 was day 1
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 because June 6 was day 1
   
   return Math.max(1, diffDays); // Ensure it's at least day 1
 }
