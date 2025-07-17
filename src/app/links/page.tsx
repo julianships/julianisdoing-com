@@ -19,7 +19,7 @@ const links = [
     title: "HIIT Timer App",
     url: "https://www.vibecodeapp.com/projects/2335d2e3-c384-4d94-b67c-9a06f0a68662",
     icon: Timer,
-    description: "My latest product, check it out.",
+    description: "My latest project, check it out.",
     featured: true
   },
   {
@@ -58,7 +58,8 @@ const links = [
 // Calculate days since Julian's journey started
 function getDaysSinceStart() {
   // Julian's journey start date (Day 1 was October 21, 2024)
-  const journeyStartDate = new Date('2024-10-21');
+  // Month is 0-indexed in JS, so 9 is October.
+  const journeyStartDate = new Date(2024, 9, 21);
   const today = new Date();
   
   // Reset both dates to midnight to avoid timezone issues
