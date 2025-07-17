@@ -19,7 +19,7 @@ const links = [
     title: "HIIT Timer App",
     url: "https://www.vibecodeapp.com/projects/2335d2e3-c384-4d94-b67c-9a06f0a68662",
     icon: Timer,
-    description: "My latest project, check it out.",
+    description: "My latest product, check it out.",
     featured: true
   },
   {
