@@ -19,7 +19,7 @@ import {
 const links = [
   {
     title: "Polish'd",
-    url: "https://www.vibecodeapp.com/projects/a7a7a7a7-a7a7-a7a7-a7a7-a7a7a7a7a7a7",
+    url: "https://www.vibecodeapp.com/projects/8ab67800-215b-4449-afce-2fe7b0e33b3b",
     icon: Sparkles,
     description: "My latest product, check it out.",
     featured: true
