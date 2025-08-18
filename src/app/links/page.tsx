@@ -11,16 +11,32 @@ import {
   Twitter,
   Youtube,
   BookOpen,
-  Timer // Added Timer icon
+  Timer, // Added Timer icon
+  Leaf, // Added Leaf icon for Plant Snap AI
+  Sparkles // Added Sparkles icon for Polish'd app
 } from "lucide-react";
 
 const links = [
   {
+    title: "Polish'd",
+    url: "https://www.vibecodeapp.com/projects/a7a7a7a7-a7a7-a7a7-a7a7-a7a7a7a7a7a7",
+    icon: Sparkles,
+    description: "My latest product, check it out.",
+    featured: true
+  },
+  {
+    title: "Plant Snap AI",
+    url: "https://www.vibecodeapp.com/projects/1117df31-e303-4876-9876-7bebb276b243",
+    icon: Leaf,
+    description: "Built using Vibe Code.",
+    featured: false
+  },
+  {
     title: "HIIT Timer App",
     url: "https://www.vibecodeapp.com/projects/2335d2e3-c384-4d94-b67c-9a06f0a68662",
     icon: Timer,
-    description: "My latest product, check it out.",
-    featured: true
+    description: "Built using Vibe Code.",
+    featured: false,
   },
   {
     title: "Journaling App",
