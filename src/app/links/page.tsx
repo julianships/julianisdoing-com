@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { 
@@ -11,40 +11,53 @@ import {
   Twitter,
   Youtube,
   BookOpen,
-  Timer, // Added Timer icon
-  Leaf, // Added Leaf icon for Plant Snap AI
-  Sparkles // Added Sparkles icon for Polish'd app
+  Timer,
+  Leaf,
+  Sparkles,
+  ListPlus, // Icon for waitlist
+  ChevronDown, // Icon for accordion
+  Smartphone // Icon for Vibe Code apps
 } from "lucide-react";
 
-const links = [
+// The new waitlist link
+const waitlistLink = {
+  title: "Waitlist",
+  url: "https://www.notion.so/julianisdoing/Julian-s-Social-Analytics-Waitlist-27133403eb5180b3b603e9e768289971?pvs=4",
+  icon: ListPlus,
+  description: "Waitlist for my new social analytics app",
+  featured: true
+};
+
+// Vibe Code Apps grouped together
+const vibeCodeApps = [
   {
     title: "Polish'd",
     url: "https://www.vibecodeapp.com/projects/8ab67800-215b-4449-afce-2fe7b0e33b3b",
     icon: Sparkles,
-    description: "My latest product, check it out.",
-    featured: true
+    description: "AI nail scanning app",
   },
   {
     title: "Plant Snap AI",
     url: "https://www.vibecodeapp.com/projects/1117df31-e303-4876-9876-7bebb276b243",
     icon: Leaf,
-    description: "Built using Vibe Code.",
-    featured: false
+    description: "Plant analyzer via picture",
   },
   {
     title: "HIIT Timer App",
     url: "https://www.vibecodeapp.com/projects/2335d2e3-c384-4d94-b67c-9a06f0a68662",
     icon: Timer,
-    description: "Built using Vibe Code.",
-    featured: false,
+    description: "Customizable HIIT timer",
   },
   {
     title: "Journaling App",
     url: "https://www.vibecodeapp.com/projects/4e7ea1de-ea55-4092-acc9-02942341757a",
     icon: BookOpen,
-    description: "Built using Vibe Code.",
-    featured: false // No longer the featured item
+    description: "A simple journaling tool",
   },
+];
+
+// Social and other links
+const socialLinks = [
   {
     title: "TikTok",
     url: "https://www.tiktok.com/@julianisdoing", 
@@ -90,6 +103,7 @@ function getDaysSinceStart() {
 
 export default function LinksPage() {
   const [dayCount, setDayCount] = useState(1);
+  const [isVibeCodeOpen, setVibeCodeOpen] = useState(false);
 
   // Update day count on component mount and clear any cache
   useEffect(() => {
@@ -142,52 +156,121 @@ export default function LinksPage() {
         </motion.div>
 
         {/* Links */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="space-y-3"
-        >
-          {links.map((link, index) => (
+        <div className="space-y-3">
+          {/* Waitlist Link */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <Button
+              variant="primary"
+              className="w-full justify-start p-4 h-auto group relative overflow-hidden shadow-glow"
+              onClick={() => window.open(waitlistLink.url, '_blank')}
+            >
+              <div className="flex items-center gap-4 w-full">
+                <div className="p-2 rounded-lg bg-white/20">
+                  <waitlistLink.icon className="w-5 h-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium">{waitlistLink.title}</div>
+                  <div className="text-sm text-white/80">{waitlistLink.description}</div>
+                </div>
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Button>
+          </motion.div>
+
+          {/* Social Links */}
+          {socialLinks.map((link, index) => (
             <motion.div
               key={link.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 * index }}
+              transition={{ duration: 0.4, delay: 0.2 + 0.1 * index }}
             >
               <Button
-                variant={link.featured ? "primary" : "secondary"}
-                className={`w-full justify-start p-4 h-auto group relative overflow-hidden ${
-                  link.featured ? "shadow-glow" : ""
-                }`}
+                variant="secondary"
+                className="w-full justify-start p-4 h-auto group relative overflow-hidden"
                 onClick={() => window.open(link.url, '_blank')}
               >
                 <div className="flex items-center gap-4 w-full">
-                  <div className={`p-2 rounded-lg ${
-                    link.featured 
-                      ? "bg-white/20" 
-                      : "bg-accent/10 group-hover:bg-accent/20"
-                  } transition-colors`}>
+                  <div className="p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
                     <link.icon className="w-5 h-5" />
                   </div>
-                  
                   <div className="flex-1 text-left">
                     <div className="font-medium">{link.title}</div>
-                    <div className={`text-sm ${
-                      link.featured 
-                        ? "text-white/80" 
-                        : "text-muted-foreground"
-                    }`}>
-                      {link.description}
-                    </div>
+                    <div className="text-sm text-muted-foreground">{link.description}</div>
                   </div>
-                  
                   <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Button>
             </motion.div>
           ))}
-        </motion.div>
+
+          {/* Vibe Code Apps Accordion */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 + 0.1 * socialLinks.length }}
+            className="rounded-lg overflow-hidden border border-border/50"
+          >
+            <Button
+              variant="secondary"
+              className="w-full justify-start p-4 h-auto group relative"
+              onClick={() => setVibeCodeOpen(!isVibeCodeOpen)}
+            >
+              <div className="flex items-center gap-4 w-full">
+                <div className="p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium">Apps Built with Vibe Code</div>
+                  <div className="text-sm text-muted-foreground">4 projects and counting</div>
+                </div>
+                <motion.div
+                  animate={{ rotate: isVibeCodeOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </motion.div>
+              </div>
+            </Button>
+
+            <AnimatePresence>
+              {isVibeCodeOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="bg-secondary/50"
+                >
+                  <div className="p-3 space-y-3">
+                    {vibeCodeApps.map((app, index) => (
+                      <Button
+                        key={app.title}
+                        variant="ghost"
+                        className="w-full justify-start p-3 h-auto group"
+                        onClick={() => window.open(app.url, '_blank')}
+                      >
+                        <div className="flex items-center gap-4 w-full">
+                          <div className="p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                            <app.icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="font-medium">{app.title}</div>
+                          </div>
+                          <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
 
         {/* Footer */}
         <motion.div
