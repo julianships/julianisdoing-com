@@ -247,7 +247,7 @@ export default function LinksPage() {
                   className="bg-secondary/50"
                 >
                   <div className="p-3 space-y-3">
-                    {vibeCodeApps.map((app, index) => (
+                    {vibeCodeApps.map((app) => (
                       <Button
                         key={app.title}
                         variant="ghost"
