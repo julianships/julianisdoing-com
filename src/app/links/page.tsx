@@ -21,7 +21,7 @@ import {
 
 // The new waitlist link
 const waitlistLink = {
-  title: "Waitlist",
+  title: "Social Analytics Waitlist",
   url: "https://www.notion.so/julianisdoing/Julian-s-Social-Analytics-Waitlist-27133403eb5180b3b603e9e768289971?pvs=4",
   icon: ListPlus,
   description: "Waitlist for my new social analytics app",
