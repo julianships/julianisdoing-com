@@ -16,7 +16,8 @@ import {
   Sparkles,
   ListPlus, // Icon for waitlist
   ChevronDown, // Icon for accordion
-  Smartphone // Icon for Vibe Code apps
+  Smartphone, // Icon for Vibe Code apps
+  Search // Icon for Tweet Scraper
 } from "lucide-react";
 
 // The new waitlist link
@@ -58,6 +59,12 @@ const vibeCodeApps = [
 
 // Social and other links
 const socialLinks = [
+  {
+    title: "Tweet Scraper",
+    url: "https://tweet-scraper-plum.vercel.app/",
+    icon: Search,
+    description: "Extract insights from any Twitter account"
+  },
   {
     title: "TikTok",
     url: "https://www.tiktok.com/@julianisdoing", 
