@@ -20,12 +20,12 @@ import {
   Search // Icon for Tweet Scraper
 } from "lucide-react";
 
-// The new waitlist link
-const waitlistLink = {
-  title: "Social Analytics Waitlist",
-  url: "https://www.notion.so/julianisdoing/Julian-s-Social-Analytics-Waitlist-27133403eb5180b3b603e9e768289971?pvs=4",
-  icon: ListPlus,
-  description: "Waitlist for my new social analytics app",
+// The new featured link
+const featuredLink = {
+  title: "Tweet Scraper",
+  url: "https://tweet-scraper-plum.vercel.app/",
+  icon: Search,
+  description: "Extract insights from any Twitter account",
   featured: true
 };
 
@@ -60,10 +60,10 @@ const vibeCodeApps = [
 // Social and other links
 const socialLinks = [
   {
-    title: "Tweet Scraper",
-    url: "https://tweet-scraper-plum.vercel.app/",
-    icon: Search,
-    description: "Extract insights from any Twitter account"
+    title: "Social Analytics Waitlist",
+    url: "https://www.notion.so/julianisdoing/Julian-s-Social-Analytics-Waitlist-27133403eb5180b3b603e9e768289971?pvs=4",
+    icon: ListPlus,
+    description: "Waitlist for my new social analytics app",
   },
   {
     title: "TikTok",
@@ -164,7 +164,7 @@ export default function LinksPage() {
 
         {/* Links */}
         <div className="space-y-3">
-          {/* Waitlist Link */}
+          {/* Featured Link */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -173,15 +173,15 @@ export default function LinksPage() {
             <Button
               variant="primary"
               className="w-full justify-start p-4 h-auto group relative overflow-hidden shadow-glow"
-              onClick={() => window.open(waitlistLink.url, '_blank')}
+              onClick={() => window.open(featuredLink.url, '_blank')}
             >
               <div className="flex items-center gap-4 w-full">
                 <div className="p-2 rounded-lg bg-white/20">
-                  <waitlistLink.icon className="w-5 h-5" />
+                  <featuredLink.icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-medium">{waitlistLink.title}</div>
-                  <div className="text-sm text-white/80">{waitlistLink.description}</div>
+                  <div className="font-medium">{featuredLink.title}</div>
+                  <div className="text-sm text-white/80">{featuredLink.description}</div>
                 </div>
                 <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
