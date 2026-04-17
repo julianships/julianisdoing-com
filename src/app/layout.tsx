@@ -15,11 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Julian Albou",
   description:
-    "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
+    "Generalist building Victus and AI-driven systems for product iteration, content, and mobile app distribution.",
   keywords: [
     "Julian Albou",
     "AI-driven development",
     "mobile app distribution",
+    "Victus",
+    "AI pipelines",
     "founder",
     "growth",
   ],
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Julian Albou",
     description:
-      "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
+      "Generalist building Victus and AI-driven systems for product iteration, content, and mobile app distribution.",
     url: "https://julianisdoing.com",
     type: "website",
   },
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Julian Albou",
     description:
-      "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
+      "Generalist building Victus and AI-driven systems for product iteration, content, and mobile app distribution.",
   },
 };
 
