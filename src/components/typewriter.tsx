@@ -66,7 +66,7 @@ Over the last year, I've gone all in on AI-driven development. I'm currently bui
       const timeout = setTimeout(() => {
         setDisplayedText(summary.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
-      }, 10);
+      }, 50);
 
       return () => clearTimeout(timeout);
     }
@@ -81,29 +81,34 @@ Over the last year, I've gone all in on AI-driven development. I'm currently bui
   }, []);
 
   return (
-    <div className="min-h-screen bg-background px-6 py-16 md:py-20">
-      <div className="mx-auto max-w-5xl space-y-14">
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="mx-auto max-w-3xl text-center"
-        >
-          <pre className="font-mono text-lg leading-relaxed whitespace-pre-wrap text-foreground md:text-xl">
-            {displayedText}
-            <span
-              className={`ml-1 inline-block h-6 w-0.5 bg-accent ${
-                showCursor ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          </pre>
-        </motion.section>
+    <div className="bg-background">
+      <section className="min-h-screen px-6">
+        <div className="flex min-h-screen items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <pre className="font-mono text-lg leading-relaxed whitespace-pre-wrap text-foreground md:text-xl">
+              {displayedText}
+              <span
+                className={`ml-1 inline-block h-6 w-0.5 bg-accent ${
+                  showCursor ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </pre>
+          </motion.div>
+        </div>
+      </section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25 }}
-          className="space-y-5"
+      <section className="px-6 pb-20 md:pb-28">
+        <motion.div
+          initial={{ opacity: 0, y: 48 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.18 }}
+          className="mx-auto max-w-5xl space-y-5"
         >
           <div className="space-y-3 text-center">
             <p className="font-mono text-xs uppercase tracking-[0.35em] text-accent">
@@ -122,9 +127,14 @@ Over the last year, I've gone all in on AI-driven development. I'm currently bui
             {projects.map((project, index) => (
               <motion.article
                 key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.35 + index * 0.1 }}
+                initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{
+                  duration: 0.65,
+                  delay: 0.1 + index * 0.1,
+                  ease: "easeOut",
+                }}
+                viewport={{ once: true, amount: 0.24 }}
                 className={`rounded-2xl border border-border bg-muted/70 p-6 text-left shadow-md backdrop-blur-sm ${
                   project.featured ? "md:col-span-2" : ""
                 }`}
@@ -177,8 +187,8 @@ Over the last year, I've gone all in on AI-driven development. I'm currently bui
               </motion.article>
             ))}
           </div>
-        </motion.section>
-      </div>
+        </motion.div>
+      </section>
     </div>
   );
 }
