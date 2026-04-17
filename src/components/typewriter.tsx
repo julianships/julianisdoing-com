@@ -57,7 +57,7 @@ export function Typewriter() {
 
   const summary = `Hi, my name is Julian Albou
 
-I'm a generalist with a strong bias toward action, leverage, and learning fast. I spent four years helping build and grow a company in a high stakes industry from a small team into a business doing more than $2M in annual revenue. Because we started lean, I worked across business development, sales, events, marketing, product, design, and growth.
+I'm a generalist with a strong bias toward action, leverage, and learning fast. I've spent most of my career in high-stakes environments, helping small teams punch above their weight. My experience spans engineering, business development, sales, events, distribution, product, design, and growth.
 
 Over the last year, I've gone all in on AI-driven development. I'm currently building Victus, a gamified self-improvement app, and building the systems around it, including an internal pipeline for automated video generation, scheduling, posting, and analytics. These days I spend most of my time thinking about AI tooling, product iteration, and mobile app distribution.`;
 
