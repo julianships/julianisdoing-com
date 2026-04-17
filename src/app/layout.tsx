@@ -13,20 +13,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Julian Is Doing",
-  description: "Building apps with AI tools • Getting back in touch with my creative side • Creating daily content and documenting it all",
-  keywords: ["Julian", "AI tools", "building in public", "content creation", "journaling app"],
+  title: "Julian Albou",
+  description:
+    "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
+  keywords: [
+    "Julian Albou",
+    "AI-driven development",
+    "mobile app distribution",
+    "founder",
+    "growth",
+  ],
   authors: [{ name: "Julian Albou" }],
   openGraph: {
-    title: "Julian Is Doing",
-    description: "Building apps with AI tools • Getting back in touch with my creative side • Creating daily content and documenting it all",
+    title: "Julian Albou",
+    description:
+      "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
     url: "https://julianisdoing.com",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "Julian Is Doing", 
-    description: "Building apps with AI tools • Getting back in touch with my creative side • Creating daily content and documenting it all",
+    title: "Julian Albou",
+    description:
+      "Curiosity-driven generalist focused on AI-driven development and mobile app distribution.",
   },
 };
 

@@ -3,53 +3,18 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-// Calculate days since Julian's journey started
-function getDaysSinceStart() {
-  // Julian's journey start date (Day 1 was June 6, 2025)
-  // Month is 0-indexed in JS, so 5 is June.
-  const journeyStartDate = new Date(2025, 5, 6);
-  const today = new Date();
-  
-  // Reset both dates to midnight to avoid timezone issues
-  journeyStartDate.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-  
-  const diffTime = today.getTime() - journeyStartDate.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 because June 6 was day 1
-  
-  return Math.max(1, diffDays); // Ensure it's at least day 1
-}
-
 export function Typewriter() {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
-  const [dayCount, setDayCount] = useState(1);
 
-  // Update day count on component mount and clear any cache
-  useEffect(() => {
-    // Clear any old sessionStorage data
-    sessionStorage.removeItem('julianDayCount');
-    sessionStorage.removeItem('julianLastCheck');
-    
-    // Get fresh day count
-    const currentDay = getDaysSinceStart();
-    setDayCount(currentDay);
-    
-    // Store today's calculation
-    sessionStorage.setItem('julianDayCount', currentDay.toString());
-    sessionStorage.setItem('julianLastCheck', new Date().toDateString());
-  }, []);
+  const summary = `Hi, my name is Julian Albou
 
-  const summary = `Julian Is Doing
+A curiosity-driven generalist who loves exploring new topics and interests. Currently focused on AI-driven development and mobile app distribution.
 
-Building apps with AI tools.
-Getting back in touch with my creative side.
-Creating daily content and documenting it all.
+I spent four years as a founder in a high-stakes industry, driving growth through business development, conference networking, event hosting, and sales calls. We started as a small team, so my work touched marketing, design, product, growth, and more. Eventually, the business scaled to $2M+ in annual revenue.
 
-This is day ${dayCount} and counting.
-
-You can just do things.`;
+I left my role about a year ago to reconnect with family and chase my passion for AI. Since then, I've gone deep and kept a close eye on the latest trends and meta.`;
 
   useEffect(() => {
     if (currentIndex < summary.length) {
@@ -70,12 +35,6 @@ You can just do things.`;
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Reset typing animation when day count changes
-  useEffect(() => {
-    setDisplayedText("");
-    setCurrentIndex(0);
-  }, [dayCount]);
-
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-background">
       <motion.div
@@ -91,4 +50,4 @@ You can just do things.`;
       </motion.div>
     </div>
   );
-} 
+}
