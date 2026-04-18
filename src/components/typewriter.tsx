@@ -1088,24 +1088,26 @@ function OverviewAside({ view }: { view: ViewState }) {
           />
         </div>
 
-        <div className="overview-phone-stack">
-          <div className="overview-phone-frame is-back">
-            <Image
-              src="/projects/victus/05.png"
-              alt=""
-              fill
-              sizes="160px"
-              className="overview-phone-image"
-            />
-          </div>
-          <div className="overview-phone-frame is-front">
-            <Image
-              src="/projects/victus/02.png"
-              alt=""
-              fill
-              sizes="180px"
-              className="overview-phone-image"
-            />
+        <div className="overview-victus-video-shell">
+          <div className="overview-victus-demo-frame">
+            <video
+              className="overview-victus-demo-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/projects/victus/overview-demo-poster.webp?v=20260418c"
+            >
+              <source
+                src="/projects/victus/overview-demo.mp4?v=20260418c"
+                type="video/mp4"
+              />
+              <source
+                src="/projects/victus/overview-demo.webm?v=20260418c"
+                type="video/webm"
+              />
+            </video>
           </div>
         </div>
       </div>
@@ -1115,15 +1117,36 @@ function OverviewAside({ view }: { view: ViewState }) {
   if (view.overview.aside === "praise-lock") {
     return (
       <div className="overview-aside overview-aside-praise" aria-hidden="true">
-        <div className="overview-phone-stack overview-phone-stack-single">
-          <div className="overview-phone-frame is-front">
-            <Image
-              src="/projects/praiselock/pray-screen.png"
-              alt=""
-              fill
-              sizes="180px"
-              className="overview-phone-image"
-            />
+        <div className="overview-praise-wordmark-shell">
+          <Image
+            src="/projects/praiselock/wordmark.png"
+            alt=""
+            width={2092}
+            height={732}
+            className="overview-praise-wordmark"
+          />
+        </div>
+
+        <div className="overview-praise-video-shell">
+          <div className="overview-praise-demo-frame">
+            <video
+              className="overview-praise-demo-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/projects/praiselock/overview-demo-poster.webp?v=20260418c"
+            >
+              <source
+                src="/projects/praiselock/overview-demo.mp4?v=20260418c"
+                type="video/mp4"
+              />
+              <source
+                src="/projects/praiselock/overview-demo.webm?v=20260418c"
+                type="video/webm"
+              />
+            </video>
           </div>
         </div>
       </div>
@@ -1243,9 +1266,6 @@ function OverviewTile({ view }: { view: ViewState }) {
         }`}
       >
         <div className="overview-copy">
-          {view.overview.kicker ? (
-            <p className="presentation-kicker">{view.overview.kicker}</p>
-          ) : null}
           <h1 className="overview-title">{view.overview.title}</h1>
 
           <div className="overview-body">
@@ -1253,15 +1273,6 @@ function OverviewTile({ view }: { view: ViewState }) {
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-
-          <div className="highlight-row" aria-label="Highlights">
-            {view.overview.highlights.map((item) => (
-              <span key={item} className="highlight-pill">
-                {item}
-              </span>
-            ))}
-          </div>
-
         </div>
 
         {view.overview.aside ? <OverviewAside view={view} /> : null}
