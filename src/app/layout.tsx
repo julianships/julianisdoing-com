@@ -4,21 +4,22 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Julian Albou",
   description:
-    "Generalist building Victus, AI-driven systems, and live products across mobile and web.",
+    "AI-first software developer building mobile products, automation systems, and distribution tooling.",
   keywords: [
     "Julian Albou",
     "Victus",
-    "AI-driven development",
-    "mobile app distribution",
+    "AI-first developer",
+    "software developer",
+    "mobile app development",
+    "automation systems",
     "PhotoCV.ai",
-    "founder",
     "engineer",
   ],
   authors: [{ name: "Julian Albou" }],
   openGraph: {
     title: "Julian Albou",
     description:
-      "Generalist building Victus, AI-driven systems, and live products across mobile and web.",
+      "AI-first software developer building mobile products, automation systems, and distribution tooling.",
     url: "https://julianisdoing.com",
     type: "website",
   },
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Julian Albou",
     description:
-      "Generalist building Victus, AI-driven systems, and live products across mobile and web.",
+      "AI-first software developer building mobile products, automation systems, and distribution tooling.",
   },
 };
 
@@ -37,7 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

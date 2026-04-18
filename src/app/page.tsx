@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import { Typewriter } from "@/components/typewriter";
 
 export default function Home() {
-  return <Typewriter />;
+  return (
+    <Suspense fallback={null}>
+      <Typewriter />
+    </Suspense>
+  );
 }
