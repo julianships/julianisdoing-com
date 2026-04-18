@@ -1,55 +1,98 @@
 "use client";
 
+import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Star, X } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowUpRight,
+  MapPin,
+  Star,
+} from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import {
+  siInstagram,
+  siTiktok,
+  siX,
+  siYoutube,
+} from "simple-icons";
 
-type ProjectLink = {
+type ViewId =
+  | "about"
+  | "victus"
+  | "content-ops"
+  | "praise-lock"
+  | "photocv";
+
+type ExternalLinkItem = {
   label: string;
   href: string;
   primary?: boolean;
 };
 
-type ProjectMetric = {
-  value: string;
+type StackCardItem = {
   label: string;
+  detail: string;
 };
 
-type ProjectWorkflowStep = {
+type ListSection = {
+  kicker: string;
   title: string;
-  body: string;
+  items: string[];
+  cards?: StackCardItem[];
 };
 
-type ProjectDecision = {
+type VisualMode = "profile" | "app" | "brand" | "ops";
+
+type BrandGlyph = {
   title: string;
-  problem: string;
-  solution: string;
+  path: string;
+  hex: string;
 };
 
-type ProjectGalleryItem = {
-  src: string;
-  alt: string;
+type ViewState = {
+  id: ViewId;
+  accent: string;
+  accentSoft: string;
+  dockDot: string;
+  dock: {
+    label: string;
+    imageSrc?: string;
+    textIcon?: string;
+    iconClassName?: string;
+  };
+  visual: {
+    kicker: string;
+    title: string;
+    subtitle?: string;
+    location?: string;
+    mode: VisualMode;
+    imageSrc?: string;
+    logoSrc?: string;
+    textIcon?: string;
+    iconClassName?: string;
+    platforms?: string[];
+    ratingValue?: string;
+    ratingLabel?: string;
+    installs?: string;
+    tags?: string[];
+    opsSteps?: string[];
+  };
+  overview: {
+    kicker?: string;
+    title: string;
+    body: string[];
+    highlights: string[];
+    links?: ExternalLinkItem[];
+    aside?: "victus" | "praise-lock" | "photocv" | "content-ops";
+  };
+  stack: ListSection;
+  flow: ListSection;
+  notes: ListSection;
 };
 
-type Project = {
-  id: string;
-  label: string;
-  title: string;
-  status: string;
-  summary: string;
-  details?: string[];
-  tileBadges?: string[];
-  metrics?: ProjectMetric[];
-  stack?: string[];
-  workflow?: ProjectWorkflowStep[];
-  considerations?: string[];
-  publicSignals?: string[];
-  decisions?: ProjectDecision[];
-  gallery?: ProjectGalleryItem[];
-  links?: ProjectLink[];
-  iconSrc?: string;
-};
+const transition = { duration: 0.22, ease: "easeOut" } as const;
 
 const photocvPairs = [
   {
@@ -96,990 +139,1612 @@ const photocvPairs = [
 
 const photocvRailPairs = [...photocvPairs, ...photocvPairs];
 
-const projects: Project[] = [
+const aboutUsageSnapshot = {
+  total: "30.9B+",
+  last30: "21.8B",
+} as const;
+
+const aboutUsageTrend = [
+  { month: "May", cumulative: 0 },
+  { month: "Jun", cumulative: 277286568 },
+  { month: "Jul", cumulative: 1213970146 },
+  { month: "Aug", cumulative: 1276077379 },
+  { month: "Sep", cumulative: 1543081436 },
+  { month: "Oct", cumulative: 1548065964 },
+  { month: "Nov", cumulative: 1549592483 },
+  { month: "Dec", cumulative: 1749530909 },
+  { month: "Jan", cumulative: 3963400865 },
+  { month: "Feb", cumulative: 6731271332 },
+  { month: "Mar", cumulative: 21300888908 },
+  { month: "Apr", cumulative: 30957682820 },
+] as const;
+
+function buildUsageChart(
+  series: readonly { month: string; cumulative: number }[],
+  width: number,
+  height: number,
+) {
+  const left = 0;
+  const right = width;
+  const top = Math.max(8, height * 0.03);
+  const bottom = Math.max(top + 12, height - Math.max(12, height * 0.08));
+  const max = Math.max(...series.map((point) => point.cumulative), 1);
+
+  const points = series.map((point, index) => {
+    const x = left + ((right - left) * index) / (series.length - 1);
+    const normalized = point.cumulative / max;
+    const eased = Math.pow(normalized, 0.74);
+    const y = bottom - eased * (bottom - top);
+    return {
+      ...point,
+      x: Number(x.toFixed(3)),
+      y: Number(y.toFixed(3)),
+    };
+  });
+
+  const line = points
+    .map((point, index) => {
+      if (index === 0) {
+        return `M ${point.x} ${point.y}`;
+      }
+
+      const previous = points[index - 1];
+      const controlX = Number(((previous.x + point.x) / 2).toFixed(3));
+      return `C ${controlX} ${previous.y}, ${controlX} ${point.y}, ${point.x} ${point.y}`;
+    })
+    .join(" ");
+
+  const area = `${line} L ${right} ${height} L ${left} ${height} Z`;
+
+  return {
+    points,
+    line,
+    area,
+    last: points[points.length - 1],
+  };
+}
+
+type AboutToolLogo = {
+  label: string;
+  src?: string;
+  width: number;
+  height: number;
+  lane: "raised" | "lowered";
+  kind?: "wordmark" | "lockup";
+};
+
+const aboutToolchain = [
   {
-    id: "victus",
-    label: "Flagship product",
-    title: "Victus",
-    status: "Live on App Store",
-    summary:
-      "A 66-day self-improvement system that turns onboarding data into personalized plans, daily missions, XP progression, streaks, achievements, and a public leaderboard.",
-    tileBadges: ["4.9 App Store", "985 ratings"],
-    metrics: [
-      {
-        value: "4.9",
-        label: "App Store rating",
-      },
-      {
-        value: "985",
-        label: "ratings",
-      },
-      {
-        value: "11.3.1",
-        label: "current version",
-      },
-      {
-        value: "iOS 15+",
-        label: "deployment target",
-      },
-    ],
-    stack: [
-      "Flutter / Dart client, with both Riverpod and Provider powering app state.",
-      "Firebase Auth, Firestore, Functions, Messaging, Analytics, and Crashlytics for backend and lifecycle services.",
-      "Hive + local habit cache + offline sync so check-ins feel instant and still reconcile correctly.",
-      "RevenueCat + Superwall for subscriptions, paywalls, experiments, and purchase recovery.",
-      "Mixpanel, Smartlook, Meta, and appstack integrations for attribution and behavior analysis.",
-      "Separate Next.js marketing and admin surfaces around the core mobile product.",
-    ],
-    workflow: [
-      {
-        title: "Onboarding gathers the inputs that matter",
-        body:
-          "The app walks users through acquisition source, baseline habits, pillars, obstacles, workout preferences, and now custom habits before it ever generates a plan.",
-      },
-      {
-        title: "Plan generation becomes the operating system",
-        body:
-          "Victus turns those answers into a structured 66-day journey plan, then treats that plan as the source of truth for scheduled habits and future customization.",
-      },
-      {
-        title: "Daily execution updates real progression",
-        body:
-          "Completing a habit updates completion state, XP, pillar XP, rank, streak logic, achievement checks, and reminder scheduling instead of just toggling a checkbox.",
-      },
-      {
-        title: "Retention is built into the surface area",
-        body:
-          "Leaderboards, rank progression, achievement art, radar/progress views, and the stoic framing all reinforce the feeling that the system is alive and worth returning to.",
-      },
-    ],
-    considerations: [
-      "How to keep the stoic / Spartan framing memorable without letting the product become theme-first and confusing.",
-      "How to make XP, ranks, and streaks feel motivating without encouraging spammy or low-signal habit completion.",
-      "How to let users complete habits instantly offline or on resume without corrupting XP state or streak state.",
-      "How to layer monetization around the core loop so paywalls and checkout handoffs do not poison trust.",
-      "How to preserve continuity after day 66 instead of dropping committed users into an empty end state.",
-    ],
-    publicSignals: [
-      "As of April 17, 2026, the US App Store listing shows a 4.9-star rating from 985 ratings.",
-      "The listing currently shows version 11.3.1, plus recent shipping around purchase tracking, trial conversion handling, onboarding clarity, and radar-style progress views.",
-      "The public listing is iPhone-first in Health & Fitness, with iOS 15.0+ compatibility and a live website at getvictus.com.",
-      "The subscription catalog visible on the App Store spans weekly, monthly, annual, trial, and special-offer SKUs.",
-    ],
-    decisions: [
-      {
-        title: "Make the journey plan authoritative",
-        problem:
-          "Schedule truth can drift quickly when habits are represented in multiple places, especially if UI state, local cache, and analytics data all start behaving like primary records.",
-        solution:
-          "Victus moved toward treating journey plans as the real schedule/completion source of truth, while daily check-ins became a derived store for analytics, backfill, and sync support.",
-      },
-      {
-        title: "Stop duplicate XP from race conditions",
-        problem:
-          "Fast taps, resume flows, and local-first behavior create real risk that the same habit completion gets counted more than once.",
-        solution:
-          "The local cache and completion flow were hardened with mutex-style protection plus OfflineSyncManager orchestration so the app can stay fast without double-awarding progress.",
-      },
-      {
-        title: "Extend the app past the original 66-day edge",
-        problem:
-          "A strict 66-day product sounds sharp in marketing, but a real user who finishes the program still needs the system to keep working.",
-        solution:
-          "Maintenance mode was added so the plan can continue past day 66 using later-week templates, instead of leaving committed users in a dead end.",
-      },
-      {
-        title: "Ship custom habits without breaking progression",
-        problem:
-          "Users wanted custom habits, but open-ended habits can break XP balance, scheduling, workout logic, and notification assumptions if they are bolted on carelessly.",
-        solution:
-          "Custom habits were integrated as first-class data: pending custom habit models, classification, runtime resolution, and plan-generation hooks rather than a loose notes field.",
-      },
-      {
-        title: "Stabilize monetization across platforms and handoffs",
-        problem:
-          "Paywall behavior, checkout recovery, and purchase syncing get messy fast when iOS, Android, and web all have slightly different runtime requirements.",
-        solution:
-          "Victus split platform-specific Superwall keys, improved purchase-tracking and trial-conversion handling, and added web checkout handoff logic back into the app auth flow.",
-      },
-    ],
-    gallery: [
-      {
-        src: "/projects/victus/01.png",
-        alt: "Victus App Store creative showing the core discipline positioning.",
-      },
-      {
-        src: "/projects/victus/02.png",
-        alt: "Victus daily mission screen with XP-driven progress.",
-      },
-      {
-        src: "/projects/victus/04.png",
-        alt: "Victus leaderboard screens showing competitive ranking.",
-      },
-      {
-        src: "/projects/victus/05.png",
-        alt: "Victus achievements screen with progression visuals.",
-      },
-    ],
-    links: [
-      {
-        label: "Open on App Store",
-        href: "https://apps.apple.com/us/app/victus-discipline-habits/id6754204999",
-        primary: true,
-      },
-      {
-        label: "Visit getvictus.com",
-        href: "https://www.getvictus.com",
-      },
-    ],
-    iconSrc: "/projects/victus/icon.png",
+    label: "Codex",
+    src: "/tool-logos/codex-logo.png",
+    width: 98,
+    height: 28,
+    lane: "lowered",
+    kind: "lockup",
   },
   {
-    id: "engine",
-    label: "Technical project",
-    title: "AI Content Engine",
-    status: "Internal system",
-    summary:
-      "An internal pipeline for automated video generation, scheduling, posting, and analytics.",
-    details: [
-      "Built to support Victus growth without scaling content operations linearly.",
-      "Connects generation, publishing, and feedback loops into one operating system.",
-      "The strongest representation of how I think about AI tooling, leverage, and distribution.",
-    ],
+    label: "Claude",
+    src: "/tool-logos/claude.svg",
+    width: 102,
+    height: 24,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Cursor",
+    src: "/tool-logos/cursor.svg",
+    width: 104,
+    height: 25,
+    lane: "lowered",
+    kind: "wordmark",
+  },
+  {
+    label: "Antigravity",
+    src: "/tool-logos/antigravity.png",
+    width: 140,
+    height: 24,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Modal",
+    src: "/tool-logos/modal.png",
+    width: 132,
+    height: 25,
+    lane: "lowered",
+    kind: "wordmark",
+  },
+  {
+    label: "Flutter",
+    src: "/tool-logos/flutter.svg",
+    width: 84,
+    height: 26,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Next.js",
+    src: "/tool-logos/nextjs.svg",
+    width: 98,
+    height: 23,
+    lane: "lowered",
+    kind: "wordmark",
+  },
+  {
+    label: "Firebase",
+    src: "/tool-logos/firebase.svg",
+    width: 86,
+    height: 25,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Supabase",
+    src: "/tool-logos/supabase-dark.png",
+    width: 114,
+    height: 26,
+    lane: "lowered",
+    kind: "wordmark",
+  },
+  {
+    label: "Cloudinary",
+    src: "/tool-logos/cloudinary.png",
+    width: 126,
+    height: 24,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "FFmpeg",
+    src: "/tool-logos/ffmpeg.png",
+    width: 106,
+    height: 27,
+    lane: "lowered",
+    kind: "lockup",
+  },
+  {
+    label: "Vercel",
+    src: "/tool-logos/vercel.svg",
+    width: 100,
+    height: 22,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Xcode",
+    src: "/tool-logos/xcode.jpeg",
+    width: 102,
+    height: 28,
+    lane: "lowered",
+    kind: "lockup",
+  },
+  {
+    label: "RevenueCat",
+    src: "/tool-logos/revenuecat.svg",
+    width: 104,
+    height: 25,
+    lane: "raised",
+    kind: "wordmark",
+  },
+  {
+    label: "Superwall",
+    src: "/tool-logos/superwall.png",
+    width: 114,
+    height: 32,
+    lane: "lowered",
+    kind: "wordmark",
+  },
+  {
+    label: "OpenClaw",
+    src: "/tool-logos/openclaw.png",
+    width: 138,
+    height: 34,
+    lane: "raised",
+    kind: "lockup",
+  },
+] as const satisfies readonly AboutToolLogo[];
+
+const aboutOutsideWork = [
+  {
+    label: "@julianisdoing",
+    href: "https://x.com/julianisdoing",
+    icon: siX,
+  },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@julianisdoing",
+    icon: siTiktok,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/julianisdoing/",
+    icon: siInstagram,
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/@JulianIsDoing",
+    icon: siYoutube,
+  },
+] as const;
+
+const views: ViewState[] = [
+  {
+    id: "about",
+    accent: "#d7dde8",
+    accentSoft: "rgb(215 221 232 / 0.14)",
+    dockDot: "#d7dde8",
+    dock: {
+      label: "About",
+      imageSrc: "/profile-assets/about-profile.jpg",
+    },
+    visual: {
+      kicker: "About",
+      title: "Julian Albou",
+      subtitle: "AI-first software developer",
+      location: "Europe / Remote",
+      mode: "profile",
+      imageSrc: "/profile-assets/about-profile.jpg",
+    },
+    overview: {
+      title: "Developer first. Generalist by range.",
+      body: [
+        "I build mobile apps, monetized web products, and the internal systems around them — currently Victus, a gamified self-improvement app with an automated pipeline for video generation, posting, and analytics behind it.",
+        "I came to this full-time a year ago, after several years at a high-growth startup across business development, sales, growth, product, and design. That range taught me how to operate with ambiguity, move fast with limited resources, and care about outcomes end to end.",
+        "I’m French-American — born in Paris and raised in Los Angeles — and I think that shaped a lot of how I work. I’m naturally curious, drawn to fast-moving environments, and happiest around smart people building hard things.",
+      ],
+      highlights: [
+        "Developer",
+        "Mobile + web",
+        "Automation systems",
+        "Shipped products",
+      ],
+    },
+    stack: {
+      kicker: "AI usage",
+      title: "Real volume, tracked locally.",
+      items: [],
+    },
+    flow: {
+      kicker: "Tools I like",
+      title: "What I reach for most.",
+      items: [],
+    },
+    notes: {
+      kicker: "Socials",
+      title: "Signal outside the editor.",
+      items: [],
+    },
+  },
+  {
+    id: "victus",
+    accent: "#d1ac35",
+    accentSoft: "rgb(209 172 53 / 0.14)",
+    dockDot: "#d1ac35",
+    dock: {
+      label: "Victus",
+      imageSrc: "/projects/victus/icon.png",
+    },
+    visual: {
+      kicker: "Flagship app",
+      title: "Victus",
+      mode: "app",
+      imageSrc: "/projects/victus/icon.png",
+      platforms: ["iOS", "Android"],
+      ratingValue: "4.9",
+      ratingLabel: "950+ ratings",
+      installs: "7k+ installs",
+    },
+    overview: {
+      kicker: "Overview",
+      title: "Gamified discipline app with a live product loop.",
+      body: [
+        "Victus turns onboarding inputs into a personalized 66-day journey, then uses daily missions, XP, streaks, achievements, and leaderboards to make execution feel alive instead of static.",
+        "The hard part is keeping the system coherent underneath the surface: onboarding logic, schedule truth, monetization, retention, and offline-safe progression all have to keep working while the product keeps shipping.",
+      ],
+      highlights: [
+        "66-day journey plans",
+        "Daily XP + streaks",
+        "Leaderboards + achievements",
+        "Live monetization",
+      ],
+      links: [
+        {
+          label: "Open on App Store",
+          href: "https://apps.apple.com/us/app/victus-discipline-habits/id6754204999",
+          primary: true,
+        },
+        {
+          label: "Visit getvictus.com",
+          href: "https://www.getvictus.com",
+        },
+      ],
+      aside: "victus",
+    },
+    stack: {
+      kicker: "Stack",
+      title: "What powers the product.",
+      items: [
+        "Flutter / Dart mobile client shipping across iOS and Android.",
+        "Firebase auth, Firestore, functions, messaging, analytics, and crash reporting.",
+        "RevenueCat plus Superwall for subscriptions, paywalls, and monetization experiments.",
+        "Local cache and sync logic so completions feel instant without corrupting progression.",
+      ],
+      cards: [
+        {
+          label: "Flutter",
+          detail:
+            "Victus ships from a single Flutter and Dart codebase across iOS and Android, which keeps onboarding, missions, and progression surfaces aligned while the product moves quickly.",
+        },
+        {
+          label: "Firebase",
+          detail:
+            "Firebase handles auth, Firestore data, functions, messaging, analytics, and crash reporting, so the backend stays cohesive instead of getting split across disconnected services.",
+        },
+        {
+          label: "RevenueCat + Superwall",
+          detail:
+            "RevenueCat runs subscriptions while Superwall controls paywalls and experiments, which makes monetization easier to iterate without slowing core product development.",
+        },
+        {
+          label: "Offline Sync",
+          detail:
+            "Local cache and reconciliation logic make completions feel instant even offline, then safely sync XP, streaks, and progression back into the shared source of truth.",
+        },
+      ],
+    },
+    flow: {
+      kicker: "How it works",
+      title: "Core loop.",
+      items: [
+        "Onboarding captures source, habits, pillars, obstacles, and preferences.",
+        "Victus generates a structured journey plan and daily mission set from that input.",
+        "Completions update XP, streaks, ranks, achievements, and retention surfaces together.",
+      ],
+    },
+    notes: {
+      kicker: "What mattered",
+      title: "Key product constraints.",
+      items: [
+        "Make gamification motivating without turning the product into empty points and noise.",
+        "Keep offline completions fast without duplicate XP or broken streak state.",
+        "Extend the product past day 66 and keep monetization handoffs trustworthy.",
+      ],
+    },
+  },
+  {
+    id: "content-ops",
+    accent: "#8e8cff",
+    accentSoft: "rgb(142 140 255 / 0.15)",
+    dockDot: "#8e8cff",
+    dock: {
+      label: "Victus Content Ops",
+      textIcon: "Ops",
+      iconClassName: "dock-icon-ops",
+    },
+    visual: {
+      kicker: "Internal system",
+      title: "Victus Content Ops",
+      subtitle: "AI distribution engine",
+      mode: "app",
+      textIcon: "Ops",
+      iconClassName: "visual-icon-ops",
+      opsSteps: ["Generate", "Render", "Schedule", "Analyze"],
+      tags: ["Internal", "AI", "Distribution"],
+    },
+    overview: {
+      kicker: "Overview",
+      title: "Internal engine for generating, scheduling, and learning from content.",
+      body: [
+        "I built the Victus content ops system so organic content could scale more like software than like a manual workflow. The goal was leverage: more output, tighter iteration, less drag.",
+        "It turns ideas into generated videos, routes them through scheduling providers, and closes the loop with analytics so distribution behaves like an operating system rather than a checklist.",
+      ],
+      highlights: [
+        "AI generation",
+        "Scheduler integrations",
+        "Analytics feedback loop",
+        "Multi-account operations",
+      ],
+      links: [
+        {
+          label: "Open Victus",
+          href: "https://www.getvictus.com",
+          primary: true,
+        },
+      ],
+      aside: "content-ops",
+    },
+    stack: {
+      kicker: "Stack",
+      title: "Operating pieces.",
+      items: [
+        "Project adapters and account-group abstractions to keep content workflows structured.",
+        "Generation backends that can run locally or through Modal depending on the job.",
+        "Cloudinary asset hosting plus Firestore-backed project state and reconciliation.",
+        "Upload-Post as the primary scheduling provider, with legacy PostBridge support where needed.",
+      ],
+      cards: [
+        {
+          label: "Project Adapters",
+          detail:
+            "Project adapters and account-group abstractions keep content workflows structured, so the system can scale across lanes and accounts without collapsing into ad hoc scripts.",
+        },
+        {
+          label: "Modal",
+          detail:
+            "Generation backends can run locally or through Modal depending on the job, which keeps heavier rendering and automation work flexible instead of forcing one execution path.",
+        },
+        {
+          label: "Cloudinary + Firestore",
+          detail:
+            "Cloudinary stores the asset layer while Firestore tracks project state and reconciliation, giving the pipeline both durable media hosting and a reliable operating record.",
+        },
+        {
+          label: "Upload-Post",
+          detail:
+            "Upload-Post is the main scheduling provider, with legacy PostBridge support where needed, so publishing can keep running while provider migrations happen in the background.",
+        },
+      ],
+    },
+    flow: {
+      kicker: "How it works",
+      title: "Distribution loop.",
+      items: [
+        "Start from a project, script source, or content lane instead of ad hoc one-offs.",
+        "Generate assets and render variations through a repeatable pipeline.",
+        "Schedule against the active provider, publish, and pull analytics back into the system.",
+      ],
+    },
+    notes: {
+      kicker: "What mattered",
+      title: "System constraints.",
+      items: [
+        "Scale output without scaling headcount linearly.",
+        "Keep project state deterministic even when many jobs are moving at once.",
+        "Support provider migrations while treating performance data as product feedback.",
+      ],
+    },
+  },
+  {
+    id: "praise-lock",
+    accent: "#6ea9ff",
+    accentSoft: "rgb(110 169 255 / 0.14)",
+    dockDot: "#6ea9ff",
+    dock: {
+      label: "Praise Lock",
+      imageSrc: "/projects/praiselock/icon-full-bleed.png",
+    },
+    visual: {
+      kicker: "Prayer-first app",
+      title: "Praise Lock",
+      mode: "app",
+      imageSrc: "/projects/praiselock/icon-full-bleed.png",
+      platforms: ["iOS", "Android"],
+      ratingValue: "4.8",
+      ratingLabel: "40+ ratings",
+      installs: "500 installs",
+    },
+    overview: {
+      kicker: "Overview",
+      title: "Prayer-first blocker that turns distraction into ritual.",
+      body: [
+        "Praise Lock blocks distracting apps, reroutes the moment into a guided prayer flow, and hands the user back with a cleaner reset instead of another doomscroll.",
+        "It’s a good second signal because it mixes native permissions, cross-platform mobile work, generated content, and subscription infrastructure inside one focused product.",
+      ],
+      highlights: [
+        "App lock integrations",
+        "Generated prayer flow",
+        "iOS + Android",
+        "Live subscriptions",
+      ],
+      links: [
+        {
+          label: "Visit praiselock.com",
+          href: "https://www.praiselock.com",
+          primary: true,
+        },
+      ],
+      aside: "praise-lock",
+    },
+    stack: {
+      kicker: "Stack",
+      title: "What powers it.",
+      items: [
+        "Flutter / Dart with Riverpod and go_router for a focused mobile flow.",
+        "iOS Family Controls plus Android accessibility and usage-access integrations.",
+        "SharedPreferences and Sqflite-backed storage for blocked apps and prayer history.",
+        "RevenueCat, Superwall, Mixpanel, and Firebase analytics around subscriptions and behavior.",
+      ],
+      cards: [
+        {
+          label: "Flutter",
+          detail:
+            "Praise Lock uses Flutter and Dart with Riverpod and go_router to keep the prayer flow, state management, and cross-platform UX consistent across iOS and Android.",
+        },
+        {
+          label: "Permissions Layer",
+          detail:
+            "iOS Family Controls and Android accessibility and usage-access integrations are the hard native layer that make blocking, rerouting, and recovery flows actually work.",
+        },
+        {
+          label: "Local Storage",
+          detail:
+            "SharedPreferences and Sqflite store blocked apps, prayer history, and local state so the app can react immediately without depending on network round-trips.",
+        },
+        {
+          label: "Monetization + Analytics",
+          detail:
+            "RevenueCat, Superwall, Mixpanel, and Firebase analytics tie subscriptions to behavior data, which helps pricing and retention decisions stay connected to real usage.",
+        },
+      ],
+    },
+    flow: {
+      kicker: "How it works",
+      title: "Core loop.",
+      items: [
+        "Users choose which apps, categories, and sites should be gated.",
+        "Blocked app launches and notification taps route into the prayer experience.",
+        "Prayer generation, streaks, and journey state turn the interruption into a repeatable habit loop.",
+      ],
+    },
+    notes: {
+      kicker: "What mattered",
+      title: "Key build decisions.",
+      items: [
+        "Reconciling very different iOS and Android permission models cleanly.",
+        "Making every blocked-app or notification route land in the right prayer state.",
+        "Keeping generated prayers fresh while introducing subscriptions without cheapening the product.",
+      ],
+    },
   },
   {
     id: "photocv",
-    label: "Live web product",
-    title: "PhotoCV.ai",
-    status: "Live and monetizing",
-    summary:
-      "A France-first AI headshot product for CV and LinkedIn photos, built around conversion, automated delivery, and a real paid funnel.",
-    metrics: [
-      {
-        value: "€29-59",
-        label: "one-time pricing tiers",
-      },
-      {
-        value: "10-200",
-        label: "photos per order",
-      },
-      {
-        value: "8-20",
-        label: "selfies required",
-      },
-      {
-        value: "~30 min",
-        label: "average delivery target",
-      },
-    ],
-    stack: [
-      "Next.js 15 App Router with TypeScript and Tailwind driving the web product and SEO surface area.",
-      "Supabase for auth, PostgreSQL data, storage, gated flows, and order state across the funnel.",
-      "Stripe checkout plus webhook-driven payment confirmation and post-checkout recovery.",
-      "Custom FLUX-based generation pipeline for training, prompt generation, image output, and quality filtering.",
-      "Resend for lifecycle email automation, plus GA4, DataFast, Meta, and LinkedIn for attribution and funnel tracking.",
-      "Vercel deployment with edge delivery, webhook handlers, and a large city/service landing-page footprint.",
-    ],
-    workflow: [
-      {
-        title: "Acquire through SEO, ads, and focused landing pages",
-        body:
-          "PhotoCV is built around France-first acquisition, with city pages, service pages, paid traffic, and product-led copy all pushing into the same funnel.",
-      },
-      {
-        title: "Collect just enough input to personalize the generation",
-        body:
-          "Users authenticate, upload 8-20 selfies, choose style combinations, and confirm order context before the paid generation ever starts.",
-      },
-      {
-        title: "Move from payment into generation without losing trust",
-        body:
-          "Stripe checkout, webhooks, order-state transitions, wait states, and email updates all need to feel reliable because users are handing over money before results exist.",
-      },
-      {
-        title: "Deliver a usable gallery, not just raw model output",
-        body:
-          "The generation pipeline tunes the model, expands prompts, produces multiple outputs, filters quality, and delivers a dashboard where users can favorite and download the results.",
-      },
-    ],
-    considerations: [
-      "How much friction to add up front: enough selfies and style detail to get good outputs, but not so much that the funnel collapses.",
-      "How to make preview watermarks useful for conversion without making previews feel low-trust or easy to exploit.",
-      "How to keep preview-to-paid handoff clean so users do not lose the outputs they already liked.",
-      "How to localize aggressively for search while keeping routing, indexing, and analytics sane.",
-      "How to make an AI photo product feel reliable enough to charge money for, not just interesting enough to demo.",
-    ],
-    publicSignals: [
-      "The live product positions itself as an AI CV and LinkedIn headshot service for French-speaking professionals who want results without a studio shoot.",
-      "The documented pricing model is one-time purchase rather than subscription, with three tiers ranging from €29 to €59.",
-      "The funnel is built around upload, checkout, wait-state processing, and dashboard delivery rather than a toy prompt box.",
-      "The public site has expanded into city-specific and service-specific landing pages, which signals an active acquisition and SEO strategy.",
-    ],
-    decisions: [
-      {
-        title: "Preserve preview momentum instead of restarting the funnel",
-        problem:
-          "Users who engage with preview outputs can drop if the paid flow feels like a full reset or if the final results do not connect back to what they already saw.",
-        solution:
-          "Recent PhotoCV work promoted paid preview images into final results and tightened the preview-to-paid generation handoff so the experience feels continuous.",
-      },
-      {
-        title: "Treat watermarking as a conversion system, not just a protection layer",
-        problem:
-          "Watermarks need to prevent abuse, but harsh treatment can also make the product feel cheap or undermine the perceived quality of the generated photo.",
-        solution:
-          "Recent iterations softened preview watermark treatment, then restored styled watermark assets so the previews stay branded and usable without giving away the product.",
-      },
-      {
-        title: "Tighten attribution before scaling paid acquisition",
-        problem:
-          "If GA4 and ad attribution are loose, optimization gets noisy and it becomes hard to tell which search or landing work is actually paying back.",
-        solution:
-          "Recent repo work tightened GA4 ads attribution and focused the France search setup so growth decisions can rest on cleaner funnel data.",
-      },
-    ],
-    gallery: [
-      {
-        src: "/projects/photocv/demo1-selfie.webp",
-        alt: "PhotoCV input selfie example.",
-      },
-      {
-        src: "/projects/photocv/demo1-ai.webp",
-        alt: "PhotoCV generated professional headshot example.",
-      },
-      {
-        src: "/projects/photocv/demo7-selfie.webp",
-        alt: "Second PhotoCV input selfie example.",
-      },
-      {
-        src: "/projects/photocv/demo7-ai.webp",
-        alt: "Second PhotoCV generated professional headshot example.",
-      },
-    ],
-    links: [
-      {
-        label: "Visit PhotoCV.ai",
-        href: "https://www.photocv.ai",
-        primary: true,
-      },
-    ],
-    iconSrc: "/projects/photocv/favicon.png",
-  },
-  {
-    id: "praise-lock",
-    label: "Prayer-first app",
-    title: "Praise Lock",
-    status: "Live on iOS and Android",
-    summary:
-      "A prayer-first app blocker that locks distracting apps until the user takes a moment to worship, then hands them into a guided prayer flow instead of another doomscroll.",
-    metrics: [
-      {
-        value: "iOS + Android",
-        label: "supported platforms",
-      },
-      {
-        value: "1.0.1+25",
-        label: "current mobile build",
-      },
-      {
-        value: "api.praiselock.com",
-        label: "generation and promo API",
-      },
-      {
-        value: "Live",
-        label: "web + mobile presence",
-      },
-    ],
-    stack: [
-      "Flutter / Dart mobile app with Riverpod, go_router, and SF Pro Rounded styling for a native-feeling prayer flow.",
-      "System app-lock integrations for iOS Family Controls and Android accessibility / usage access so blocked-app launches can route into the prayer journey.",
-      "SharedPreferences plus Sqflite-backed prayer storage to persist blocked apps, prayer history, onboarding state, and journey progress locally.",
-      "RevenueCat observer-mode billing plus Superwall paywall orchestration for subscriptions and upgrade flows across both stores.",
-      "Mixpanel, Firebase Analytics, Crashlytics, Singular, Smartlook, and Meta events for instrumentation and debugging.",
-      "HTTP-backed prayer generation service hitting api.praiselock.com, with repeat-avoidance logic for scripture references and recent books.",
-    ],
-    workflow: [
-      {
-        title: "Choose the distractions worth blocking",
-        body:
-          "Users configure the apps, categories, and web domains they want to gate, then the native lock setup checks whether the required system permissions are actually configured.",
-      },
-      {
-        title: "Intercept the urge instead of just tracking it",
-        body:
-          "When a blocked app is launched or the notification route is tapped, the app-lock service converts that into a structured event so the user lands in prayer instead of slipping through a broken handoff.",
-      },
-      {
-        title: "Generate a prayer that fits the moment",
-        body:
-          "The prayer generation service sends mood, intent, profile context, and recent prayer history to the API so the app can avoid stale verses and repeated references.",
-      },
-      {
-        title: "Turn prayer into rhythm, not a one-off interruption",
-        body:
-          "Completed prayers feed streak data, journey state, and review / retention surfaces so the experience becomes a habit loop rather than a novelty blocker.",
-      },
-    ],
-    considerations: [
-      "How much friction is healthy: enough to interrupt compulsive app opens, but not so much that the app feels punitive or brittle.",
-      "How to reconcile very different platform permission models between iOS Family Controls and Android accessibility / usage access.",
-      "How to make notification taps and blocked-app launches land in the correct prayer route every time instead of producing dead ends.",
-      "How to generate prayers that feel personal without repeating the same scripture references or themes too often.",
-      "How to introduce subscriptions and paywalls without making a spiritual product feel transactional or spammy.",
-    ],
-    publicSignals: [
-      "The live website positions Praise Lock as a product that locks your phone until you worship, with explicit iOS and Android availability.",
-      "The support FAQ explains the core mechanic clearly: block distracting apps, trigger a moment of prayer, then unlock afterward.",
-      "Both the web surface and the mobile app point to a live production API at api.praiselock.com.",
-      "Recent git history shows active work on notifications, paywall integrations, platform-specific lock handling, and prayer-flow UX.",
-    ],
-    decisions: [
-      {
-        title: "Make notification tap routing a first-class path",
-        problem:
-          "A prayer blocker fails if blocked-app launches or notifications ever send users into the wrong screen or a dead-end state.",
-        solution:
-          "The app lock service now models blocked-app launches, shield actions, and notification taps as explicit event types so the prayer route can be handled consistently.",
-      },
-      {
-        title: "Back prayer history with real persistence",
-        problem:
-          "Prayer streaks and journey copy lose credibility fast if local data is fragile or the app cannot reconcile prayers across sessions.",
-        solution:
-          "Praise Lock uses SharedPreferences for lightweight state and Sqflite-backed prayer storage so streak rebuilds and history reads stay deterministic.",
-      },
-      {
-        title: "Avoid stale or repetitive generated prayers",
-        problem:
-          "AI-assisted prayer generation can feel generic if it keeps surfacing the same verse references or books back-to-back.",
-        solution:
-          "The API request includes recent references and recent books so the generator can explicitly reject repeats instead of pretending every response is fresh.",
-      },
-      {
-        title: "Untangle monetization from platform edge cases",
-        problem:
-          "Subscriptions across iOS and Android become messy when paywall state, observer mode, and platform-specific billing expectations drift apart.",
-        solution:
-          "Recent work moved deeper into RevenueCat observer-mode configuration plus Superwall paywall updates so billing behavior is more consistent across both platforms.",
-      },
-    ],
-    gallery: [
-      {
-        src: "/projects/praiselock/notification-tap.png",
-        alt: "Praise Lock notification routing screen.",
-      },
-      {
-        src: "/projects/praiselock/lock-screen.png",
-        alt: "Praise Lock lock screen view.",
-      },
-      {
-        src: "/projects/praiselock/pray-screen.png",
-        alt: "Praise Lock prayer flow screen.",
-      },
-    ],
-    links: [
-      {
-        label: "Visit praiselock.com",
-        href: "https://www.praiselock.com",
-        primary: true,
-      },
-      {
-        label: "Contact support",
-        href: "mailto:support@praiselock.com",
-      },
-    ],
-    iconSrc: "/projects/praiselock/icon-full-bleed.png",
-    details: [
-      "Built to turn mindless app opens into a more intentional prayer ritual.",
-      "Uses native lock integrations, prayer generation, and subscription infrastructure in one tight mobile loop.",
-      "A good complement to Victus because it shows I build focused products, not just one flagship app.",
-    ],
-  },
-  {
-    id: "coming-soon",
-    label: "Reserved slot",
-    title: "Coming Soon",
-    status: "In progress",
-    summary:
-      "A placeholder for the next app in the stack, intentionally kept visible to show momentum.",
-    details: [
-      "This slot is meant to stay blank until the next product is ready to be shown publicly.",
-      "It gives the board a sense of movement rather than feeling like a finished archive.",
-      "Once the project is public, this tile can turn into a full project card and modal.",
-    ],
+    accent: "#5ee6a8",
+    accentSoft: "rgb(94 230 168 / 0.14)",
+    dockDot: "#5ee6a8",
+    dock: {
+      label: "PhotoCV.ai",
+      imageSrc: "/projects/photocv/favicon.png",
+    },
+    visual: {
+      kicker: "Live web product",
+      title: "PhotoCV.ai",
+      subtitle: "AI resume photos",
+      mode: "app",
+      imageSrc: "/projects/photocv/favicon.png",
+      platforms: ["Web"],
+      tags: ["Web", "Live", "Monetizing"],
+    },
+    overview: {
+      kicker: "Overview",
+      title: "Live AI headshot product with real funnel pressure.",
+      body: [
+        "PhotoCV.ai is built around a paid consumer flow: upload selfies, choose styles, check out, wait through generation, and download results that are good enough for LinkedIn and job applications.",
+        "What makes it interesting is that it isn’t just a demo. It’s live, monetizing, localized, and built around acquisition, delivery reliability, and conversion.",
+      ],
+      highlights: [
+        "Live revenue",
+        "France-first SEO",
+        "Stripe + delivery automation",
+        "Before/after gallery",
+      ],
+      links: [
+        {
+          label: "Visit PhotoCV.ai",
+          href: "https://www.photocv.ai",
+          primary: true,
+        },
+      ],
+      aside: "photocv",
+    },
+    stack: {
+      kicker: "Stack",
+      title: "What powers the funnel.",
+      items: [
+        "Next.js 15, TypeScript, and Tailwind driving the web product and landing-page surface.",
+        "Supabase for auth, PostgreSQL data, storage, gated flows, and order state.",
+        "Stripe checkout plus webhook-driven confirmation and recovery.",
+        "Custom FLUX-based generation pipeline, lifecycle email automation, and Vercel deployment.",
+      ],
+      cards: [
+        {
+          label: "Next.js",
+          detail:
+            "Next.js 15, TypeScript, and Tailwind power both the product flow and the landing-page surface, so acquisition and conversion work live in the same system.",
+        },
+        {
+          label: "Supabase",
+          detail:
+            "Supabase handles auth, PostgreSQL data, storage, gated flows, and order state, which keeps the customer journey grounded in one operational backend.",
+        },
+        {
+          label: "Stripe",
+          detail:
+            "Stripe checkout and webhook-driven confirmation handle payment, recovery, and post-purchase state changes so the handoff into generation stays trustworthy.",
+        },
+        {
+          label: "Generation Pipeline",
+          detail:
+            "A custom FLUX-based generation pipeline, lifecycle email automation, and Vercel deployment keep delivery reliable after purchase instead of treating generation like a black box.",
+        },
+      ],
+    },
+    flow: {
+      kicker: "How it works",
+      title: "Customer journey.",
+      items: [
+        "Acquire through focused landing pages, SEO, and paid traffic.",
+        "Collect 8 to 20 selfies plus style selections before generation starts.",
+        "Move from payment into processing cleanly and deliver a usable final gallery.",
+      ],
+    },
+    notes: {
+      kicker: "What mattered",
+      title: "Product constraints.",
+      items: [
+        "Finding the right balance between funnel friction and output quality.",
+        "Making previews convert without making the product feel low-trust.",
+        "Keeping watermarking, preview-to-paid handoff, and localization analytics coherent.",
+      ],
+    },
   },
 ];
 
-const projectMap = Object.fromEntries(
-  projects.map((project) => [project.id, project])
-) as Record<string, Project>;
+const viewMap = Object.fromEntries(
+  views.map((view) => [view.id, view])
+) as Record<ViewId, ViewState>;
 
-const introMeta = "Founder • Engineer • AI systems • Distribution";
+function isViewId(value: string | null): value is ViewId {
+  return value !== null && value in viewMap;
+}
 
-const dockItems = [
-  {
-    id: "victus",
-    icon: "V",
-    imageSrc: "/projects/victus/icon.png",
-    name: "Victus",
-    glowClassName: "dock-item-glow-victus",
-  },
-  {
-    id: "praise-lock",
-    icon: "P",
-    imageSrc: "/projects/praiselock/icon-full-bleed.png",
-    name: "Praise Lock",
-    glowClassName: "dock-item-glow-praise",
-  },
-  {
-    id: "coming-soon",
-    icon: "+",
-    name: "Coming Soon",
-    glowClassName: "dock-item-glow-neutral",
-  },
-];
+function isProjectView(view: ViewState) {
+  return view.id !== "about";
+}
 
-export function Typewriter() {
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  const [featuredProjectId, setFeaturedProjectId] = useState<string>("victus");
+function getViewHref(id: ViewId) {
+  return `/?view=${id}`;
+}
 
-  const selectedProject = selectedProjectId
-    ? projectMap[selectedProjectId] ?? null
-    : null;
-  const featuredProject = projectMap[featuredProjectId] ?? projectMap.victus;
-  const isVictusFeatured = featuredProject.id === "victus";
-  const isPraiseFeatured = featuredProject.id === "praise-lock";
-  const isComingSoonFeatured = featuredProject.id === "coming-soon";
-
-  const hasRichContent = Boolean(
-    selectedProject?.metrics ||
-      selectedProject?.stack ||
-      selectedProject?.workflow ||
-      selectedProject?.considerations ||
-      selectedProject?.publicSignals ||
-      selectedProject?.decisions ||
-      selectedProject?.gallery
+function TileSwap({
+  swapKey,
+  className,
+  children,
+}: {
+  swapKey: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={swapKey}
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={transition}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
+}
 
-  const sectionPanelCount =
-    Number(Boolean(selectedProject?.stack?.length)) +
-    Number(Boolean(selectedProject?.publicSignals?.length)) +
-    Number(Boolean(selectedProject?.considerations?.length));
+function AboutIdentityPanel({ view }: { view: ViewState }) {
+  if (!view.visual.imageSrc) {
+    return null;
+  }
 
   return (
-    <>
-      <main className="presentation-page">
-        <section className="presentation-stage px-4 py-3 md:px-6 md:py-4">
-          <div className="mx-auto max-w-[1500px]">
-            <div className="presentation-board">
-              <section className="presentation-tile tile-intro intro-tile">
-                <div className="intro-body">
-                  <p className="presentation-kicker">Julian Albou</p>
-                  <div className="intro-text">
-                    <h1 className="intro-title">
-                      Generalist with a bias toward action, leverage, and
-                      learning fast.
-                    </h1>
-                    <p className="intro-copy">
-                      Most of my career has been in high-stakes environments,
-                      helping small teams punch above their weight across
-                      engineering, distribution, product, design, and growth.
-                    </p>
-                    <p className="intro-copy">
-                      Right now I&apos;m focused on AI-driven development,
-                      mobile products, and the systems around them, especially
-                      Victus and the content engine built to grow it.
-                    </p>
-                  </div>
+    <div className="visual-profile-card about-identity-card">
+      <div className="visual-profile-photo-shell about-identity-photo-shell">
+        <Image
+          src={view.visual.imageSrc}
+          alt="Julian Albou"
+          fill
+          sizes="(max-width: 1279px) 100vw, 300px"
+          priority
+          className="visual-profile-photo"
+        />
+      </div>
+
+      <div className="visual-copy about-identity-copy">
+        <div className="visual-heading">
+          <h2 className="visual-title">{view.visual.title}</h2>
+          {view.visual.subtitle ? (
+            <p className="visual-subtitle about-identity-role">
+              {view.visual.subtitle}
+            </p>
+          ) : null}
+          {view.id === "about" ? (
+            <p className="about-identity-emoji-row" aria-label="Personal signals">
+              🇺🇸 🇫🇷 🏍️ 🏂 ✈️ 🎾 🧗‍♂️ 👨‍💻
+            </p>
+          ) : null}
+        </div>
+
+        {view.visual.location ? (
+          <div className="about-identity-location">
+            <MapPin className="about-identity-location-icon" />
+            <span>{view.visual.location}</span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function BrandMark({
+  icon,
+  label,
+}: {
+  icon: BrandGlyph;
+  label: string;
+}) {
+  const normalized = icon.hex.toLowerCase();
+  const color =
+    normalized === "000000" || normalized === "171717" || normalized === "181717"
+      ? "#f5f5f7"
+      : `#${icon.hex}`;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="brand-mark"
+      style={{ color }}
+    >
+      <title>{label}</title>
+      <path d={icon.path} fill="currentColor" />
+    </svg>
+  );
+}
+
+function ViewVisual({ view }: { view: ViewState }) {
+  if (view.id === "about") {
+    return <AboutIdentityPanel view={view} />;
+  }
+
+  if (view.visual.mode === "profile" && view.visual.imageSrc) {
+    return (
+      <div className="visual-profile-card">
+        <div className="visual-profile-photo-shell">
+          <Image
+            src={view.visual.imageSrc}
+            alt="Julian Albou"
+            fill
+            sizes="(max-width: 1279px) 100vw, 320px"
+            priority
+            className="visual-profile-photo"
+          />
+        </div>
+
+        <div className="visual-copy">
+          <div className="visual-heading">
+            <p className="presentation-kicker">{view.visual.kicker}</p>
+            <h2 className="visual-title">{view.visual.title}</h2>
+            {view.visual.subtitle ? (
+              <p className="visual-subtitle">{view.visual.subtitle}</p>
+            ) : null}
+          </div>
+
+          {view.visual.tags?.length ? (
+            <div className="badge-row">
+              {view.visual.tags.map((tag) => (
+                <span key={tag} className="badge-pill">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    view.visual.mode === "app" &&
+    (view.visual.imageSrc || view.visual.textIcon)
+  ) {
+    return (
+      <div className="visual-app-card">
+        <p className="presentation-kicker">{view.visual.kicker}</p>
+
+        <div className={`visual-icon-shell ${view.visual.iconClassName ?? ""}`}>
+          {view.visual.imageSrc ? (
+            <Image
+              src={view.visual.imageSrc}
+              alt={`${view.visual.title} icon`}
+              width={120}
+              height={120}
+              className="visual-app-icon"
+            />
+          ) : view.visual.textIcon ? (
+            <span className="visual-icon-text">{view.visual.textIcon}</span>
+          ) : null}
+        </div>
+
+        <div className="visual-copy visual-copy-centered">
+          <h2 className="visual-title">{view.visual.title}</h2>
+          {view.visual.subtitle ? (
+            <p className="visual-subtitle">{view.visual.subtitle}</p>
+          ) : null}
+
+          {view.visual.platforms?.length ? (
+            <div className="platform-row" aria-label="Platforms">
+              {view.visual.platforms.map((platform) => (
+                <span key={platform} className="platform-pill">
+                  {platform}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {view.visual.tags?.length ? (
+            <div className="badge-row">
+              {view.visual.tags.map((tag) => (
+                <span key={tag} className="badge-pill">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="stat-row">
+            {view.visual.ratingValue && view.visual.ratingLabel ? (
+              <div className="rating-row" aria-label="App rating">
+                <Star className="rating-star" />
+                <span className="rating-value">{view.visual.ratingValue}</span>
+                <span className="rating-label">{view.visual.ratingLabel}</span>
+              </div>
+            ) : null}
+
+            {view.visual.installs ? (
+              <span className="install-pill">{view.visual.installs}</span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view.visual.mode === "brand" && view.visual.logoSrc) {
+    return (
+      <div className="visual-brand-card">
+        <p className="presentation-kicker">{view.visual.kicker}</p>
+
+        <div className="visual-brand-logo-shell">
+          <Image
+            src={view.visual.logoSrc}
+            alt={view.visual.title}
+            width={769}
+            height={324}
+            className="visual-brand-logo"
+          />
+        </div>
+
+        <div className="visual-copy">
+          <h2 className="visual-title">{view.visual.title}</h2>
+          {view.visual.subtitle ? (
+            <p className="visual-subtitle">{view.visual.subtitle}</p>
+          ) : null}
+
+          {view.visual.tags?.length ? (
+            <div className="badge-row">
+              {view.visual.tags.map((tag) => (
+                <span key={tag} className="badge-pill">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="visual-ops-card">
+      <div className="visual-heading">
+        <p className="presentation-kicker">{view.visual.kicker}</p>
+        <h2 className="visual-title">{view.visual.title}</h2>
+        {view.visual.subtitle ? (
+          <p className="visual-subtitle">{view.visual.subtitle}</p>
+        ) : null}
+      </div>
+
+      <div className="ops-grid" aria-hidden="true">
+        {view.visual.opsSteps?.map((step) => (
+          <span key={step} className="ops-node">
+            {step}
+          </span>
+        ))}
+      </div>
+
+      {view.visual.tags?.length ? (
+        <div className="badge-row">
+          {view.visual.tags.map((tag) => (
+            <span key={tag} className="badge-pill">
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function OverviewAside({ view }: { view: ViewState }) {
+  if (view.overview.aside === "victus") {
+    return (
+      <div className="overview-aside overview-aside-victus" aria-hidden="true">
+        <div className="overview-victus-wordmark-shell">
+          <Image
+            src="/projects/victus/wordmark.png"
+            alt=""
+            width={716}
+            height={330}
+            className="overview-victus-wordmark"
+          />
+        </div>
+
+        <div className="overview-phone-stack">
+          <div className="overview-phone-frame is-back">
+            <Image
+              src="/projects/victus/05.png"
+              alt=""
+              fill
+              sizes="160px"
+              className="overview-phone-image"
+            />
+          </div>
+          <div className="overview-phone-frame is-front">
+            <Image
+              src="/projects/victus/02.png"
+              alt=""
+              fill
+              sizes="180px"
+              className="overview-phone-image"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view.overview.aside === "praise-lock") {
+    return (
+      <div className="overview-aside overview-aside-praise" aria-hidden="true">
+        <div className="overview-phone-stack overview-phone-stack-single">
+          <div className="overview-phone-frame is-front">
+            <Image
+              src="/projects/praiselock/pray-screen.png"
+              alt=""
+              fill
+              sizes="180px"
+              className="overview-phone-image"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view.overview.aside === "content-ops") {
+    return (
+      <div className="overview-aside overview-aside-ops" aria-hidden="true">
+        <div className="ops-flow-diagram">
+          {["Prompt", "Render", "Schedule", "Analyze"].map((step) => (
+            <div key={step} className="ops-flow-card">
+              {step}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (view.overview.aside === "photocv") {
+    return (
+      <div className="overview-aside overview-aside-photocv" aria-hidden="true">
+        <div className="photocv-home-carousel">
+          <div className="photocv-home-side photocv-home-side-before">
+            <div className="photocv-home-track photocv-home-track-before">
+              {photocvRailPairs.map((pair, index) => (
+                <div
+                  key={`photocv-before-${pair.name}-${index}`}
+                  className="photocv-home-card"
+                >
+                  <Image
+                    src={pair.before}
+                    alt=""
+                    fill
+                    sizes="88px"
+                    className="photocv-home-image photocv-home-image-before"
+                  />
                 </div>
-
-                <p className="intro-meta">{introMeta}</p>
-              </section>
-
-              <motion.button
-                type="button"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                onClick={() => setSelectedProjectId(featuredProject.id)}
-                className={`presentation-tile project-tile tile-victus tile-showcase text-left ${
-                  isPraiseFeatured
-                    ? "tile-showcase-praise"
-                    : isComingSoonFeatured
-                      ? "tile-showcase-coming"
-                      : "tile-showcase-victus"
-                }`}
-              >
-                {isVictusFeatured ? (
-                  <div className="victus-card-content">
-                    <div className="victus-icon-shell">
-                      <Image
-                        src="/projects/victus/icon.png"
-                        alt="Victus icon"
-                        width={92}
-                        height={92}
-                        className="victus-card-icon"
-                      />
-                    </div>
-
-                    <div className="victus-card-copy">
-                      <h2 className="project-title victus-card-title">Victus</h2>
-
-                      <div className="victus-platform-row" aria-label="Platforms">
-                        <span className="victus-platform-pill">iOS</span>
-                        <span className="victus-platform-pill">Android</span>
-                      </div>
-
-                      <div className="victus-stat-row">
-                        <div className="victus-rating-row" aria-label="App rating">
-                          <Star className="victus-rating-star" />
-                          <span className="victus-rating-value">4.9</span>
-                          <span className="victus-rating-meta">950+ ratings</span>
-                        </div>
-
-                        <span className="victus-install-pill">7k+ installs</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : isPraiseFeatured ? (
-                  <div className="victus-card-content">
-                    <div className="victus-icon-shell praise-showcase-icon-shell">
-                      <Image
-                        src="/projects/praiselock/icon-full-bleed.png"
-                        alt="Praise Lock icon"
-                        width={92}
-                        height={92}
-                        className="victus-card-icon"
-                      />
-                    </div>
-
-                    <div className="victus-card-copy">
-                      <h2 className="project-title victus-card-title">
-                        Praise Lock
-                      </h2>
-
-                      <div className="victus-platform-row" aria-label="Platforms">
-                        <span className="victus-platform-pill">iOS</span>
-                        <span className="victus-platform-pill">Android</span>
-                      </div>
-
-                      <div className="victus-stat-row">
-                        <div className="victus-rating-row" aria-label="App rating">
-                          <Star className="victus-rating-star" />
-                          <span className="victus-rating-value">4.8</span>
-                          <span className="victus-rating-meta">40+ ratings</span>
-                        </div>
-
-                        <span className="victus-install-pill">500 installs</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="showcase-card showcase-card-coming">
-                    <div className="showcase-copy">
-                      <p className="presentation-kicker">Next app</p>
-                      <h2 className="project-title showcase-title">Coming Soon</h2>
-                      <p className="showcase-summary">
-                        Reserved for the next shipped product in the stack.
-                      </p>
-                    </div>
-
-                    <div className="showcase-placeholder">+</div>
-                  </div>
-                )}
-              </motion.button>
-
-              <motion.button
-                type="button"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                onClick={() => setSelectedProjectId("engine")}
-                className="presentation-tile project-tile tile-engine text-left"
-              >
-                <div className="tile-topline">
-                  <p className="presentation-kicker">AI Content Engine</p>
-                  <span className="status-pill">Technical project</span>
-                </div>
-
-                <h2 className="project-title project-title-sm">
-                  Distribution systems for Victus.
-                </h2>
-                <p className="project-summary">
-                  Generate, schedule, publish, and analyze from one internal
-                  pipeline.
-                </p>
-
-                <div className="micro-list">
-                  <span>Generate</span>
-                  <span>Schedule</span>
-                  <span>Publish</span>
-                  <span>Analyze</span>
-                </div>
-              </motion.button>
-
-              <motion.button
-                type="button"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                onClick={() => setSelectedProjectId("photocv")}
-                className="presentation-tile project-tile tile-dock photocv-wide text-left"
-                aria-label="Open PhotoCV.ai project details"
-              >
-                <div className="photocv-wide-layout">
-                  <div className="photocv-brand-panel">
-                    <Image
-                      src="/projects/photocv/logo.png"
-                      alt="PhotoCV.ai"
-                      width={769}
-                      height={324}
-                      className="photocv-logo-image"
-                    />
-                  </div>
-
-                  <div className="photocv-home-carousel" aria-hidden="true">
-                    <div className="photocv-home-side photocv-home-side-before">
-                      <div className="photocv-home-track photocv-home-track-before">
-                        {photocvRailPairs.map((pair, index) => (
-                        <div
-                          key={`photocv-before-${pair.name}-${index}`}
-                          className="photocv-home-card"
-                        >
-                          <Image
-                            src={pair.before}
-                            alt=""
-                            fill
-                            sizes="88px"
-                            className="photocv-home-image photocv-home-image-before"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    </div>
-
-                    <div className="photocv-home-side photocv-home-side-after">
-                      <div className="photocv-home-track photocv-home-track-after">
-                        {photocvRailPairs.map((pair, index) => (
-                          <div
-                            key={`photocv-after-${pair.name}-${index}`}
-                            className="photocv-home-card"
-                          >
-                          <Image
-                            src={pair.after}
-                            alt=""
-                            fill
-                            sizes="88px"
-                            className="photocv-home-image"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    </div>
-
-                    <div className="photocv-home-divider">
-                      <div className="photocv-divider-line" />
-                      <div className="photocv-divider-orb">
-                        <svg
-                          className="photocv-divider-icon"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M13 2L5 13h5l-1 9 8-11h-5l1-9Z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.button>
-
-              <motion.button
-                type="button"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                onClick={() => setSelectedProjectId("praise-lock")}
-                className="presentation-tile project-tile tile-praise text-left"
-              >
-                <div className="tile-topline">
-                  <p className="presentation-kicker">Praise Lock</p>
-                  <span className="status-pill">Live</span>
-                </div>
-
-                <h2 className="project-title project-title-sm">
-                  Prayer-first app blocking.
-                </h2>
-
-                <div className="praise-visual">
-                  <div className="praise-logo-shell">
-                    <Image
-                      src="/projects/praiselock/icon-full-bleed.png"
-                      alt="Praise Lock icon"
-                      width={88}
-                      height={88}
-                      className="praise-logo-image"
-                    />
-                  </div>
-                </div>
-              </motion.button>
-
-              <section
-                className="presentation-tile tile-photocv dock-tile dock-compact"
-                aria-label="Built apps dock"
-              >
-                <div className="dock-shell">
-                  {dockItems.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setFeaturedProjectId(item.id)}
-                      className={`dock-item ${item.glowClassName} ${
-                        featuredProjectId === item.id ? "is-active" : ""
-                      }`}
-                      aria-label={item.name}
-                      aria-pressed={featuredProjectId === item.id}
-                    >
-                      <span className="dock-icon">
-                        {item.imageSrc ? (
-                          <Image
-                            src={item.imageSrc}
-                            alt={item.name}
-                            fill
-                            sizes="(max-width: 1279px) 72px, 78px"
-                            className="dock-icon-image"
-                          />
-                        ) : (
-                          item.icon
-                        )}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </section>
+              ))}
             </div>
           </div>
-        </section>
-      </main>
 
-      <AnimatePresence>
-        {selectedProject ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
-          >
-            <button
-              type="button"
-              aria-label="Close project sheet"
-              onClick={() => setSelectedProjectId(null)}
-              className="absolute inset-0 bg-black/72 backdrop-blur-sm"
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: 18, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              className={`modal-sheet relative w-full rounded-[32px] border border-white/8 bg-[#070708] p-6 text-left shadow-[0_40px_120px_rgba(0,0,0,0.55)] md:p-8 ${
-                hasRichContent ? "max-w-5xl modal-sheet-rich" : "max-w-2xl"
-              }`}
-            >
-              <button
-                type="button"
-                onClick={() => setSelectedProjectId(null)}
-                className="modal-close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-
-              <div className="modal-header">
-                <div className="space-y-4 pr-10">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="presentation-kicker">{selectedProject.label}</p>
-                    <span className="status-pill">{selectedProject.status}</span>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-                      {selectedProject.title}
-                    </h3>
-                    <p className="text-base leading-7 text-foreground/88 md:text-lg md:leading-8">
-                      {selectedProject.summary}
-                    </p>
-                  </div>
-                </div>
-
-                {selectedProject.iconSrc ? (
-                  <div className="project-brand-card">
-                    <Image
-                      src={selectedProject.iconSrc}
-                      alt={`${selectedProject.title} icon`}
-                      width={88}
-                      height={88}
-                    />
-                  </div>
-                ) : null}
-              </div>
-
-              {selectedProject.metrics?.length ? (
-                <div className="modal-metric-grid">
-                  {selectedProject.metrics.map((metric) => (
-                    <div key={`${metric.label}-${metric.value}`} className="metric-card">
-                      <p className="metric-value">{metric.value}</p>
-                      <p className="metric-label">{metric.label}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {selectedProject.gallery?.length ? (
-                <div className="modal-gallery">
-                  {selectedProject.gallery.map((item) => (
-                    <div key={item.src} className="modal-gallery-item">
-                      <Image
-                        src={item.src}
-                        alt={item.alt}
-                        fill
-                        sizes="(max-width: 767px) 44vw, (max-width: 1279px) 28vw, 220px"
-                        className="modal-gallery-image"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {selectedProject.stack?.length ||
-              selectedProject.publicSignals?.length ||
-              selectedProject.considerations?.length ? (
+          <div className="photocv-home-side photocv-home-side-after">
+            <div className="photocv-home-track photocv-home-track-after">
+              {photocvRailPairs.map((pair, index) => (
                 <div
-                  className={`modal-section-grid ${
-                    sectionPanelCount === 3 ? "modal-section-grid-triad" : ""
-                  }`}
+                  key={`photocv-after-${pair.name}-${index}`}
+                  className="photocv-home-card"
                 >
-                  {selectedProject.stack?.length ? (
-                    <section className="project-panel">
-                      <p className="project-panel-kicker">Stack</p>
-                      <ul className="project-panel-list">
-                        {selectedProject.stack.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
-
-                  {selectedProject.publicSignals?.length ? (
-                    <section className="project-panel">
-                      <p className="project-panel-kicker">Public signals</p>
-                      <ul className="project-panel-list">
-                        {selectedProject.publicSignals.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
-
-                  {selectedProject.considerations?.length ? (
-                    <section className="project-panel">
-                      <p className="project-panel-kicker">What I had to think about</p>
-                      <ul className="project-panel-list">
-                        {selectedProject.considerations.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
+                  <Image
+                    src={pair.after}
+                    alt=""
+                    fill
+                    sizes="88px"
+                    className="photocv-home-image"
+                  />
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="photocv-home-divider">
+            <div className="photocv-divider-line" />
+            <div className="photocv-divider-orb">
+              <svg
+                className="photocv-divider-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M13 2L5 13h5l-1 9 8-11h-5l1-9Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function OverviewTile({ view }: { view: ViewState }) {
+  if (view.id === "about") {
+    return (
+      <TileSwap swapKey={`overview-${view.id}`} className="overview-swap">
+        <div className="overview-layout about-overview-layout">
+          <div className="overview-copy about-overview-copy">
+            <p className="presentation-kicker">{view.overview.kicker}</p>
+            <h1 className="overview-title about-overview-title">
+              {view.overview.title}
+            </h1>
+
+            <div className="overview-body about-overview-body">
+              {view.overview.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </TileSwap>
+    );
+  }
+
+  return (
+    <TileSwap swapKey={`overview-${view.id}`} className="overview-swap">
+      <div
+        className={`overview-layout ${
+          view.overview.aside ? "overview-layout-with-aside" : ""
+        }`}
+      >
+        <div className="overview-copy">
+          {view.overview.kicker ? (
+            <p className="presentation-kicker">{view.overview.kicker}</p>
+          ) : null}
+          <h1 className="overview-title">{view.overview.title}</h1>
+
+          <div className="overview-body">
+            {view.overview.body.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+
+          <div className="highlight-row" aria-label="Highlights">
+            {view.overview.highlights.map((item) => (
+              <span key={item} className="highlight-pill">
+                {item}
+              </span>
+            ))}
+          </div>
+
+        </div>
+
+        {view.overview.aside ? <OverviewAside view={view} /> : null}
+      </div>
+    </TileSwap>
+  );
+}
+
+function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
+  const chartId = useId().replace(/:/g, "");
+  const chartRegionRef = useRef<HTMLDivElement | null>(null);
+  const [chartSize, setChartSize] = useState({
+    width: 360,
+    height: compact ? 360 : 172,
+  });
+
+  useEffect(() => {
+    const node = chartRegionRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    const updateChartSize = () => {
+      const rect = node.getBoundingClientRect();
+      setChartSize({
+        width: Math.max(Math.round(rect.width), 220),
+        height: Math.max(Math.round(rect.height), compact ? 220 : 120),
+      });
+    };
+
+    updateChartSize();
+
+    const observer = new ResizeObserver(() => {
+      updateChartSize();
+    });
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [compact]);
+
+  const usageChart = buildUsageChart(
+    aboutUsageTrend,
+    chartSize.width,
+    chartSize.height,
+  );
+  const dotOuterSize = Math.max(26, Math.min(chartSize.width, chartSize.height) * 0.1);
+  const dotInnerSize = dotOuterSize * 0.54;
+  const strokeWidth = Math.max(2.2, chartSize.height * 0.0135);
+
+  return (
+    <section
+      className={`about-usage-panel${compact ? " is-compact" : ""}`}
+      aria-label="Usage snapshot"
+    >
+      <div className="about-usage-body-grid">
+        <div className="about-usage-total-column">
+          <div className="about-usage-total-block">
+            <span className="about-usage-total">{aboutUsageSnapshot.total}</span>
+            <span className="about-usage-total-caption">
+              tokens used in the past 12 months
+            </span>
+          </div>
+        </div>
+
+        <div className="about-usage-live-card">
+          <div className="about-usage-live-head">
+            <span className="about-usage-live-dot" aria-hidden="true" />
+            <span className="about-usage-live-label">Last 30d</span>
+          </div>
+
+          <strong className="about-usage-live-value">
+            {aboutUsageSnapshot.last30}
+          </strong>
+        </div>
+      </div>
+
+      <div className="about-usage-chart-shell" aria-hidden="true">
+        <div className="about-usage-chart-region" ref={chartRegionRef}>
+          <svg
+            className="about-usage-chart"
+            viewBox={`0 0 ${chartSize.width} ${chartSize.height}`}
+          >
+            <defs>
+              <linearGradient
+                id={`about-usage-area-gradient-${chartId}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor="rgb(44 225 123 / 0.32)" />
+                <stop offset="78%" stopColor="rgb(44 225 123 / 0.06)" />
+                <stop offset="100%" stopColor="rgb(44 225 123 / 0)" />
+              </linearGradient>
+              <linearGradient
+                id={`about-usage-line-gradient-${chartId}`}
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="0"
+              >
+                <stop offset="0%" stopColor="rgb(245 245 247 / 0.22)" />
+                <stop offset="72%" stopColor="rgb(190 255 221 / 0.84)" />
+                <stop offset="100%" stopColor="rgb(44 225 123 / 1)" />
+              </linearGradient>
+            </defs>
+
+            <path
+              d={usageChart.area}
+              fill={`url(#about-usage-area-gradient-${chartId})`}
+            />
+            <path
+              d={usageChart.line}
+              fill="none"
+              stroke={`url(#about-usage-line-gradient-${chartId})`}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          <span
+            className="about-usage-chart-dot about-usage-chart-dot-outer"
+            style={
+              {
+                left: `${usageChart.last.x}px`,
+                top: `${usageChart.last.y}px`,
+                width: `${dotOuterSize}px`,
+                height: `${dotOuterSize}px`,
+              } as CSSProperties
+            }
+          />
+          <span
+            className="about-usage-chart-dot about-usage-chart-dot-inner"
+            style={
+              {
+                left: `${usageChart.last.x}px`,
+                top: `${usageChart.last.y}px`,
+                width: `${dotInnerSize}px`,
+                height: `${dotInnerSize}px`,
+              } as CSSProperties
+            }
+          />
+        </div>
+
+        <div className="about-usage-chart-labels">
+          <span>{aboutUsageTrend[0].month}</span>
+          <span>{aboutUsageTrend[aboutUsageTrend.length - 1].month}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ListTile({
+  view,
+  tileKey,
+  section,
+}: {
+  view: ViewState;
+  tileKey: string;
+  section: ListSection;
+}) {
+  if (view.id === "about" && tileKey === "stack") {
+    return (
+      <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+        <div className="list-tile-body about-usage-tile">
+          <div className="list-tile-head">
+            <p className="presentation-kicker">{section.kicker}</p>
+          </div>
+
+          <AboutUsagePanel compact />
+        </div>
+      </TileSwap>
+    );
+  }
+
+  if (view.id === "about" && tileKey === "flow") {
+    const renderToolSequence = (sequenceKey: string) =>
+      aboutToolchain.map((tool, index) => (
+        <div
+          key={`${sequenceKey}-${tool.label}-${index}`}
+          className={`about-tool-item is-${tool.lane} about-tool-item-${tool.label
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")}`}
+          style={
+            {
+              "--tool-width": `${tool.width}px`,
+              "--tool-height": `${tool.height}px`,
+            } as CSSProperties
+          }
+        >
+          {tool.kind === "lockup" ? (
+            <div
+              className={`about-tool-lockup about-tool-lockup-${tool.label
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")}`}
+            >
+              {tool.src ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={tool.src}
+                    alt=""
+                    className="about-tool-lockup-icon"
+                    draggable="false"
+                  />
+                </>
               ) : null}
+              <span className="about-tool-lockup-text">{tool.label}</span>
+            </div>
+          ) : tool.src ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={tool.src}
+                alt={`${tool.label} wordmark`}
+                className="about-tool-logo"
+                draggable="false"
+              />
+            </>
+          ) : null}
+        </div>
+      ));
 
-              {selectedProject.workflow?.length ? (
-                <section className="modal-section">
-                  <div className="modal-section-head">
-                    <p className="presentation-kicker">Product loop</p>
-                    <h4>How Victus works</h4>
-                  </div>
+    return (
+      <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+        <div className="list-tile-body about-toolchain-tile">
+          <div className="list-tile-head">
+            <p className="presentation-kicker">{section.kicker}</p>
+          </div>
 
-                  <div className="workflow-grid">
-                    {selectedProject.workflow.map((step, index) => (
-                      <div key={step.title} className="workflow-card">
-                        <span className="workflow-step">{`0${index + 1}`}</span>
-                        <h5>{step.title}</h5>
-                        <p>{step.body}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-
-              {selectedProject.decisions?.length ? (
-                <section className="modal-section">
-                  <div className="modal-section-head">
-                    <p className="presentation-kicker">Build notes</p>
-                    <h4>Key decisions and blockers</h4>
-                  </div>
-
-                  <div className="decision-list">
-                    {selectedProject.decisions.map((decision) => (
-                      <article key={decision.title} className="decision-card">
-                        <h5>{decision.title}</h5>
-                        <p>
-                          <span className="decision-label">Problem</span>
-                          {decision.problem}
-                        </p>
-                        <p>
-                          <span className="decision-label">Solution</span>
-                          {decision.solution}
-                        </p>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-
-              {!hasRichContent && selectedProject.details?.length ? (
-                <div className="mt-7 grid gap-3">
-                  {selectedProject.details.map((detail) => (
-                    <div
-                      key={detail}
-                      className="rounded-[22px] border border-white/8 bg-white/[0.04] px-4 py-4 text-sm leading-7 text-muted-foreground"
-                    >
-                      {detail}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="modal-link-row">
-                {selectedProject.links?.length ? (
-                  selectedProject.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={
-                        link.primary
-                          ? "modal-link-primary"
-                          : "modal-link-secondary"
-                      }
-                    >
-                      {link.label}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </a>
-                  ))
-                ) : (
-                  <div className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm text-muted-foreground">
-                    Public link not attached yet.
-                  </div>
-                )}
+          <div className="about-tool-marquee" aria-label="Tools I like">
+            <div className="about-tool-track" aria-hidden="true">
+              <div className="about-tool-sequence">
+                {renderToolSequence("primary")}
               </div>
-            </motion.div>
+              <div className="about-tool-sequence">
+                {renderToolSequence("secondary")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </TileSwap>
+    );
+  }
+
+  if (view.id === "about" && tileKey === "notes") {
+    return (
+      <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+        <div className="list-tile-body about-outside-tile">
+          <div className="list-tile-head">
+            <p className="presentation-kicker">{section.kicker}</p>
+          </div>
+
+          <div className="about-outside-row">
+            {aboutOutsideWork.map((item) => {
+              const iconNode = <BrandMark icon={item.icon} label={item.label} />;
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about-outside-pill is-link"
+                >
+                  <span className="about-outside-pill-icon">{iconNode}</span>
+                  <span>{item.label}</span>
+                  <ArrowUpRight className="about-outside-arrow" />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </TileSwap>
+    );
+  }
+
+  if (tileKey === "stack" && section.cards?.length) {
+    return (
+      <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+        <ProjectStackTile view={view} section={section} />
+      </TileSwap>
+    );
+  }
+
+  return (
+    <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+      <div className="list-tile-body">
+        <div className="list-tile-head">
+          <p className="presentation-kicker">{section.kicker}</p>
+          <h3 className="list-tile-title">{section.title}</h3>
+        </div>
+
+        <ul className="list-tile-list">
+          {section.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+    </TileSwap>
+  );
+}
+
+function ProjectStackTile({
+  view,
+  section,
+}: {
+  view: ViewState;
+  section: ListSection;
+}) {
+  const cards = section.cards ?? [];
+  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
+  const activeCard =
+    activeCardIndex === null ? null : cards[activeCardIndex] ?? null;
+
+  useEffect(() => {
+    setActiveCardIndex(null);
+  }, [view.id]);
+
+  return (
+    <div className="list-tile-body stack-detail-tile">
+      <div className="list-tile-head">
+        <div className="stack-breadcrumb-row">
+          <div className="stack-breadcrumb presentation-kicker">
+            {activeCard ? (
+              <>
+                <button
+                  type="button"
+                  className="stack-breadcrumb-back"
+                  onClick={() => setActiveCardIndex(null)}
+                >
+                  {section.kicker}
+                </button>
+                <span className="stack-breadcrumb-separator" aria-hidden="true">
+                  &gt;
+                </span>
+                <span className="stack-breadcrumb-current">{activeCard.label}</span>
+              </>
+            ) : (
+              <span className="stack-breadcrumb-root">{section.kicker}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        {activeCard ? (
+          <motion.div
+            key={`${view.id}-${activeCard.label}`}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={transition}
+            className="stack-detail-panel"
+          >
+            <p className="stack-detail-copy">{activeCard.detail}</p>
           </motion.div>
-        ) : null}
+        ) : (
+          <motion.div
+            key={`${view.id}-stack-grid`}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={transition}
+            className="stack-grid"
+          >
+            {cards.map((card, index) => {
+              const shouldSpanWide =
+                cards.length % 2 === 1 && index === cards.length - 1;
+
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`stack-grid-item ${shouldSpanWide ? "is-wide" : ""}`}
+                  onClick={() => setActiveCardIndex(index)}
+                >
+                  <span className="stack-grid-label">{card.label}</span>
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
       </AnimatePresence>
-    </>
+    </div>
+  );
+}
+
+export function Typewriter() {
+  const searchParams = useSearchParams();
+  const requestedView = searchParams.get("view");
+  const activeViewId = isViewId(requestedView) ? requestedView : "about";
+  const activeView = viewMap[activeViewId];
+  const showProjectTileSwap = isProjectView(activeView);
+
+  const boardStyle = {
+    "--state-accent": activeView.accent,
+    "--state-accent-soft": activeView.accentSoft,
+    "--state-dock-dot": activeView.dockDot,
+  } as CSSProperties;
+
+  return (
+    <main className="command-page" style={boardStyle}>
+      <section className="command-stage px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto max-w-[1560px]">
+          <div className="command-board">
+            <section className="command-tile command-tile-visual">
+              <ViewVisual view={activeView} />
+            </section>
+
+            <section className="command-tile command-tile-overview">
+              <OverviewTile view={activeView} />
+            </section>
+
+            <section className="command-tile command-tile-stack">
+              <ListTile
+                view={activeView}
+                tileKey={showProjectTileSwap ? "flow" : "stack"}
+                section={showProjectTileSwap ? activeView.flow : activeView.stack}
+              />
+            </section>
+
+            <section className="command-tile command-tile-flow">
+              <ListTile
+                view={activeView}
+                tileKey={showProjectTileSwap ? "stack" : "flow"}
+                section={showProjectTileSwap ? activeView.stack : activeView.flow}
+              />
+            </section>
+
+            <section className="command-tile command-tile-notes">
+              <ListTile view={activeView} tileKey="notes" section={activeView.notes} />
+            </section>
+
+            <nav
+              className="command-tile command-tile-dock"
+              aria-label="Project switcher"
+            >
+              <div className="dock-frame">
+                {views.map((view) => {
+                  const isActive = view.id === activeView.id;
+
+                  return (
+                    <Link
+                      key={view.id}
+                      href={getViewHref(view.id)}
+                      replace
+                      scroll={false}
+                      aria-label={view.dock.label}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`dock-app ${isActive ? "is-active" : ""}`}
+                      style={{ "--dock-item-dot": view.dockDot } as CSSProperties}
+                    >
+                      <span
+                        className={`dock-app-icon ${
+                          view.dock.iconClassName ?? ""
+                        }`}
+                      >
+                        {view.dock.imageSrc ? (
+                          <Image
+                            src={view.dock.imageSrc}
+                            alt={view.dock.label}
+                            fill
+                            sizes="(max-width: 767px) 56px, (max-width: 1279px) 64px, 74px"
+                            className="dock-app-image"
+                          />
+                        ) : (
+                          <span className="dock-app-text">{view.dock.textIcon}</span>
+                        )}
+                      </span>
+                      <span className="dock-active-dot" aria-hidden="true" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
