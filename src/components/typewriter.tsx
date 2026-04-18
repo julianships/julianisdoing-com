@@ -36,11 +36,17 @@ type StackCardItem = {
   detail: string;
 };
 
+type FlowStepItem = {
+  label: string;
+  detail: string;
+};
+
 type ListSection = {
   kicker: string;
   title: string;
   items: string[];
   cards?: StackCardItem[];
+  steps?: FlowStepItem[];
 };
 
 type VisualMode = "profile" | "app" | "brand" | "ops";
@@ -500,6 +506,20 @@ const views: ViewState[] = [
         "Victus generates a structured journey plan and daily mission set from that input.",
         "Completions update XP, streaks, ranks, achievements, and retention surfaces together.",
       ],
+      steps: [
+        {
+          label: "Onboard",
+          detail: "Capture source, habits, pillars, obstacles, and preferences.",
+        },
+        {
+          label: "Generate",
+          detail: "Build a 66-day journey and daily mission set from that input.",
+        },
+        {
+          label: "Reinforce",
+          detail: "Update XP, streaks, ranks, achievements, and retention together.",
+        },
+      ],
     },
     notes: {
       kicker: "What mattered",
@@ -593,6 +613,20 @@ const views: ViewState[] = [
         "Generate assets and render variations through a repeatable pipeline.",
         "Schedule against the active provider, publish, and pull analytics back into the system.",
       ],
+      steps: [
+        {
+          label: "Define lane",
+          detail: "Start from a project, script source, or account group.",
+        },
+        {
+          label: "Render",
+          detail: "Generate assets and variations through a repeatable pipeline.",
+        },
+        {
+          label: "Learn",
+          detail: "Schedule, publish, and feed analytics back into the system.",
+        },
+      ],
     },
     notes: {
       kicker: "What mattered",
@@ -685,6 +719,20 @@ const views: ViewState[] = [
         "Blocked app launches and notification taps route into the prayer experience.",
         "Prayer generation, streaks, and journey state turn the interruption into a repeatable habit loop.",
       ],
+      steps: [
+        {
+          label: "Gate",
+          detail: "Choose which apps, categories, and sites should be blocked.",
+        },
+        {
+          label: "Intercept",
+          detail: "Route launches and notification taps into prayer.",
+        },
+        {
+          label: "Reset",
+          detail: "Turn the interruption into prayer, streaks, and journey state.",
+        },
+      ],
     },
     notes: {
       kicker: "What mattered",
@@ -775,6 +823,20 @@ const views: ViewState[] = [
         "Acquire through focused landing pages, SEO, and paid traffic.",
         "Collect 8 to 20 selfies plus style selections before generation starts.",
         "Move from payment into processing cleanly and deliver a usable final gallery.",
+      ],
+      steps: [
+        {
+          label: "Acquire",
+          detail: "Bring visitors through focused landing pages, SEO, and paid traffic.",
+        },
+        {
+          label: "Collect",
+          detail: "Gather selfies, style choices, checkout, and order state.",
+        },
+        {
+          label: "Deliver",
+          detail: "Generate, process, and hand back a usable final gallery.",
+        },
       ],
     },
     notes: {
@@ -1170,6 +1232,39 @@ function OverviewAside({ view }: { view: ViewState }) {
   if (view.overview.aside === "photocv") {
     return (
       <div className="overview-aside overview-aside-photocv" aria-hidden="true">
+        <div className="overview-photocv-wordmark-shell">
+          <Image
+            src="/projects/photocv/logo.png"
+            alt=""
+            width={769}
+            height={324}
+            className="overview-photocv-wordmark"
+          />
+        </div>
+
+        <div className="overview-photocv-video-shell">
+          <div className="overview-photocv-demo-frame">
+            <video
+              className="overview-photocv-demo-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/projects/photocv/overview-demo-poster.webp?v=20260418a"
+            >
+              <source
+                src="/projects/photocv/overview-demo.webm?v=20260418a"
+                type="video/webm"
+              />
+              <source
+                src="/projects/photocv/overview-demo.mp4?v=20260418a"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+        </div>
+
         <div className="photocv-home-carousel">
           <div className="photocv-home-side photocv-home-side-before">
             <div className="photocv-home-track photocv-home-track-before">
@@ -1236,6 +1331,50 @@ function OverviewAside({ view }: { view: ViewState }) {
   return null;
 }
 
+function OverviewFlowPanel({ section }: { section: ListSection }) {
+  const steps =
+    section.steps ??
+    section.items.map((item, index) => ({
+      label: `Step ${index + 1}`,
+      detail: item,
+    }));
+
+  return (
+    <div className="overview-flow-panel">
+      <div className="overview-flow-head">
+        <p className="presentation-kicker">{section.kicker}</p>
+        <p className="overview-flow-title">{section.title}</p>
+      </div>
+
+      <div className="overview-flow-steps">
+        {steps.slice(0, 3).map((step, index) => (
+          <div key={step.label} className="overview-flow-step">
+            <span className="overview-flow-index">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="overview-flow-label">{step.label}</span>
+            <span className="overview-flow-detail">{step.detail}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProjectDemoTile({ view }: { view: ViewState }) {
+  return (
+    <TileSwap swapKey={`demo-${view.id}`} className="demo-tile-swap">
+      <div
+        className="project-demo-tile"
+        role="img"
+        aria-label={`${view.dock.label} product demo`}
+      >
+        <OverviewAside view={view} />
+      </div>
+    </TileSwap>
+  );
+}
+
 function OverviewTile({ view }: { view: ViewState }) {
   if (view.id === "about") {
     return (
@@ -1260,12 +1399,8 @@ function OverviewTile({ view }: { view: ViewState }) {
 
   return (
     <TileSwap swapKey={`overview-${view.id}`} className="overview-swap">
-      <div
-        className={`overview-layout ${
-          view.overview.aside ? "overview-layout-with-aside" : ""
-        }`}
-      >
-        <div className="overview-copy">
+      <div className="overview-layout">
+        <div className="overview-copy overview-copy-with-flow">
           <h1 className="overview-title">{view.overview.title}</h1>
 
           <div className="overview-body">
@@ -1273,9 +1408,9 @@ function OverviewTile({ view }: { view: ViewState }) {
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-        </div>
 
-        {view.overview.aside ? <OverviewAside view={view} /> : null}
+          <OverviewFlowPanel section={view.flow} />
+        </div>
       </div>
     </TileSwap>
   );
@@ -1692,11 +1827,15 @@ export function Typewriter() {
             </section>
 
             <section className="command-tile command-tile-stack">
-              <ListTile
-                view={activeView}
-                tileKey={showProjectTileSwap ? "flow" : "stack"}
-                section={showProjectTileSwap ? activeView.flow : activeView.stack}
-              />
+              {showProjectTileSwap ? (
+                <ProjectDemoTile view={activeView} />
+              ) : (
+                <ListTile
+                  view={activeView}
+                  tileKey="stack"
+                  section={activeView.stack}
+                />
+              )}
             </section>
 
             <section className="command-tile command-tile-flow">
