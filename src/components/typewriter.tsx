@@ -79,6 +79,7 @@ type ViewState = {
     textIcon?: string;
     iconClassName?: string;
     platforms?: string[];
+    platformUrls?: Record<string, string>;
     ratingValue?: string;
     ratingLabel?: string;
     installs?: string;
@@ -436,13 +437,18 @@ const views: ViewState[] = [
       mode: "app",
       imageSrc: "/projects/victus/icon.png",
       platforms: ["iOS", "Android"],
+      platformUrls: {
+        iOS: "https://apps.apple.com/us/app/victus-discipline-habits/id6754204999",
+        Android: "https://play.google.com/store/apps/details?id=com.victus.app",
+      },
+      tags: ["B2C", "Health & Fitness"],
       ratingValue: "4.9",
       ratingLabel: "950+ ratings",
       installs: "7k+ installs",
     },
     overview: {
       kicker: "Overview",
-      title: "Gamified discipline app with a live product loop.",
+      title: "Gamified self-improvement and habit tracker",
       body: [
         "Victus turns onboarding inputs into a personalized 66-day journey, then uses daily missions, XP, streaks, achievements, and leaderboards to make execution feel alive instead of static.",
         "The hard part is keeping the system coherent underneath the surface: onboarding logic, schedule truth, monetization, retention, and offline-safe progression all have to keep working while the product keeps shipping.",
@@ -525,9 +531,9 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "Key product constraints.",
       items: [
-        "Make gamification motivating without turning the product into empty points and noise.",
-        "Keep offline completions fast without duplicate XP or broken streak state.",
-        "Extend the product past day 66 and keep monetization handoffs trustworthy.",
+        "Frozen 66-day JourneyPlan keeps schedules, edits, and streaks from drifting.",
+        "Local cache stays authoritative for completions, XP, ranks, and achievements before Firestore sync.",
+        "Web checkout, RevenueCat, and Superwall unlock paid users without losing journey state.",
       ],
     },
   },
@@ -549,7 +555,7 @@ const views: ViewState[] = [
       textIcon: "Ops",
       iconClassName: "visual-icon-ops",
       opsSteps: ["Generate", "Render", "Schedule", "Analyze"],
-      tags: ["Internal", "AI", "Distribution"],
+      tags: ["Internal", "Agentic Pipeline"],
     },
     overview: {
       kicker: "Overview",
@@ -652,7 +658,11 @@ const views: ViewState[] = [
       title: "Praise Lock",
       mode: "app",
       imageSrc: "/projects/praiselock/icon-full-bleed.png",
-      platforms: ["iOS", "Android"],
+      platforms: ["iOS"],
+      platformUrls: {
+        iOS: "https://apps.apple.com/us/app/praise-lock-stop-focus-pray/id6759266143",
+      },
+      tags: ["B2C", "Reference"],
       ratingValue: "4.8",
       ratingLabel: "40+ ratings",
       installs: "500 installs",
@@ -760,7 +770,10 @@ const views: ViewState[] = [
       mode: "app",
       imageSrc: "/projects/photocv/favicon.png",
       platforms: ["Web"],
-      tags: ["Web", "Live", "Monetizing"],
+      platformUrls: {
+        Web: "https://www.photocv.ai",
+      },
+      tags: ["B2C", "AI Image Gen"],
     },
     overview: {
       kicker: "Overview",
@@ -1010,8 +1023,6 @@ function ViewVisual({ view }: { view: ViewState }) {
   ) {
     return (
       <div className="visual-app-card">
-        <p className="presentation-kicker">{view.visual.kicker}</p>
-
         <div className={`visual-icon-shell ${view.visual.iconClassName ?? ""}`}>
           {view.visual.imageSrc ? (
             <Image
@@ -1033,23 +1044,32 @@ function ViewVisual({ view }: { view: ViewState }) {
           ) : null}
 
           {view.visual.platforms?.length ? (
-            <div className="platform-row" aria-label="Platforms">
-              {view.visual.platforms.map((platform) => (
-                <span key={platform} className="platform-pill">
-                  {platform}
-                </span>
-              ))}
+            <div className="platform-row" aria-label="Live platform links">
+              {view.visual.platforms.map((platform) => {
+                const href = view.visual.platformUrls?.[platform];
+
+                return href ? (
+                  <a
+                    key={platform}
+                    className="platform-link"
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>{platform}</span>
+                    <ArrowUpRight className="platform-link-icon" />
+                  </a>
+                ) : (
+                  <span key={platform} className="platform-text">
+                    {platform}
+                  </span>
+                );
+              })}
             </div>
           ) : null}
 
           {view.visual.tags?.length ? (
-            <div className="badge-row">
-              {view.visual.tags.map((tag) => (
-                <span key={tag} className="badge-pill">
-                  {tag}
-                </span>
-              ))}
-            </div>
+            <p className="visual-tag-line">{view.visual.tags.join(" | ")}</p>
           ) : null}
 
           <div className="stat-row">
@@ -1341,11 +1361,6 @@ function OverviewFlowPanel({ section }: { section: ListSection }) {
 
   return (
     <div className="overview-flow-panel">
-      <div className="overview-flow-head">
-        <p className="presentation-kicker">{section.kicker}</p>
-        <p className="overview-flow-title">{section.title}</p>
-      </div>
-
       <div className="overview-flow-steps">
         {steps.slice(0, 3).map((step, index) => (
           <div key={step.label} className="overview-flow-step">
@@ -1693,6 +1708,29 @@ function ListTile({
     return (
       <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
         <ProjectStackTile view={view} section={section} />
+      </TileSwap>
+    );
+  }
+
+  if (tileKey === "notes") {
+    return (
+      <TileSwap swapKey={`${tileKey}-${view.id}`} className="list-tile-swap">
+        <div className="list-tile-body notes-tile-body">
+          <div className="list-tile-head">
+            <p className="presentation-kicker">{section.kicker}</p>
+          </div>
+
+          <ol className="notes-constraint-list">
+            {section.items.map((item, index) => (
+              <li key={item} className="notes-constraint-item">
+                <span className="notes-constraint-index">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="notes-constraint-copy">{item}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
       </TileSwap>
     );
   }
