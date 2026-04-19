@@ -1769,12 +1769,13 @@ button {
 }
 
 .dock-app.is-active .dock-app-icon {
-  transform: translateY(-4px);
-  border-color: rgb(255 255 255 / 0.16);
+  transform: translateY(-6px) scale(1.035);
+  border-color: rgb(255 255 255 / 0.26);
   box-shadow:
-    0 22px 36px rgb(0 0 0 / 0.32),
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    0 0 0 1px rgb(255 255 255 / 0.04);
+    0 28px 46px rgb(0 0 0 / 0.42),
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    0 0 0 1px rgb(255 255 255 / 0.08),
+    0 0 0 4px var(--state-accent-soft);
 }
 
 .dock-app.is-active::before {
@@ -2237,6 +2238,11 @@ button {
   .overview-victus-video-shell,
   .overview-praise-video-shell {
     height: min(410px, calc(100% - 94px));
+  }
+
+  .overview-praise-video-shell {
+    bottom: 12px;
+    height: min(390px, calc(100% - 124px));
   }
 
   .overview-aside-photocv {
