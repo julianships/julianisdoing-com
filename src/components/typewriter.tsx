@@ -41,6 +41,11 @@ type FlowStepItem = {
   detail: string;
 };
 
+type VisualMetricItem = {
+  value: string;
+  label: string;
+};
+
 type ListSection = {
   kicker: string;
   title: string;
@@ -83,6 +88,7 @@ type ViewState = {
     ratingValue?: string;
     ratingLabel?: string;
     installs?: string;
+    metrics?: VisualMetricItem[];
     tags?: string[];
     opsSteps?: string[];
   };
@@ -353,7 +359,7 @@ const aboutToolchain = [
 
 const aboutOutsideWork = [
   {
-    label: "@julianisdoing",
+    label: "X",
     href: "https://x.com/julianisdoing",
     icon: siX,
   },
@@ -395,9 +401,10 @@ const views: ViewState[] = [
     overview: {
       title: "Developer first. Generalist by range.",
       body: [
-        "I build mobile apps, monetized web products, and the internal systems around them — currently Victus, a gamified self-improvement app with an automated pipeline for video generation, posting, and analytics behind it.",
+        "I build mobile apps, monetized web products, and the internal systems around them. Currently focused on Victus, a gamified self-improvement app with an automated pipeline for video generation, posting, and analytics behind it.",
+        "The way I build is AI-native. I treat agentic tools as the primary execution layer and spend my time on architecture, product decisions, and the tradeoffs that determine whether something ships.",
         "I came to this full-time a year ago, after several years at a high-growth startup across business development, sales, growth, product, and design. That range taught me how to operate with ambiguity, move fast with limited resources, and care about outcomes end to end.",
-        "I’m French-American — born in Paris and raised in Los Angeles — and I think that shaped a lot of how I work. I’m naturally curious, drawn to fast-moving environments, and happiest around smart people building hard things.",
+        "I'm French-American, born in Paris and raised in Los Angeles, and I think that shaped a lot of how I work. I'm naturally curious, drawn to fast-moving environments, and happiest around smart people building hard things.",
       ],
       highlights: [
         "Developer",
@@ -544,18 +551,28 @@ const views: ViewState[] = [
     dockDot: "#8e8cff",
     dock: {
       label: "Victus Content Ops",
-      textIcon: "Ops",
+      imageSrc: "/projects/content-ops/icon.png?v=20260419-purple-final",
       iconClassName: "dock-icon-ops",
     },
     visual: {
       kicker: "Internal system",
       title: "Victus Content Ops",
-      subtitle: "AI distribution engine",
       mode: "app",
-      textIcon: "Ops",
+      imageSrc: "/projects/content-ops/icon.png?v=20260419-purple-final",
       iconClassName: "visual-icon-ops",
+      platforms: ["Internal"],
       opsSteps: ["Generate", "Render", "Schedule", "Analyze"],
-      tags: ["Internal", "Agentic Pipeline"],
+      tags: ["Agentic Ops", "Content Delivery"],
+      metrics: [
+        {
+          value: "1K+",
+          label: "generated videos",
+        },
+        {
+          value: "3M+",
+          label: "views",
+        },
+      ],
     },
     overview: {
       kicker: "Overview",
@@ -766,7 +783,6 @@ const views: ViewState[] = [
     visual: {
       kicker: "Live web product",
       title: "PhotoCV.ai",
-      subtitle: "AI resume photos",
       mode: "app",
       imageSrc: "/projects/photocv/favicon.png",
       platforms: ["Web"],
@@ -774,13 +790,23 @@ const views: ViewState[] = [
         Web: "https://www.photocv.ai",
       },
       tags: ["B2C", "AI Image Gen"],
+      metrics: [
+        {
+          value: "1K+",
+          label: "AI headshots generated",
+        },
+        {
+          value: "650+",
+          label: "users",
+        },
+      ],
     },
     overview: {
       kicker: "Overview",
-      title: "Live AI headshot product with real funnel pressure.",
+      title: "Live AI image generation behind a consumer flow",
       body: [
-        "PhotoCV.ai is built around a paid consumer flow: upload selfies, choose styles, check out, wait through generation, and download results that are good enough for LinkedIn and job applications.",
-        "What makes it interesting is that it isn’t just a demo. It’s live, monetizing, localized, and built around acquisition, delivery reliability, and conversion.",
+        "PhotoCV.ai turns a batch of selfies into a gallery of professional headshots. Upload, choose styles, check out, wait, download — the user never sees the pipeline underneath.",
+        "Underneath is a real generation system with cost, quality, and reliability pulling in different directions, and a funnel where acquisition, checkout, and delivery all have to stay coherent as the product keeps shipping.",
       ],
       highlights: [
         "Live revenue",
@@ -856,9 +882,9 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "Product constraints.",
       items: [
-        "Rebuilt an acquired starter codebase into a product I could actually operate: new backend, order state, and processing pipeline.",
-        "Moved from user-trained LoRA models to Fal.ai Nano Banana 2, cutting generation costs by roughly 20x and making free previews viable.",
-        "Made SEO the acquisition engine with localized pages feeding into preview, checkout, and delivery instead of a paid-traffic loop.",
+        "Rebuilt the backend and generation pipeline around reliable orders, uploads, previews, and paid delivery.",
+        "Moved from expensive LoRA training to Fal.ai Nano Banana 2, cutting generation costs by roughly 20x.",
+        "Made localized SEO the acquisition engine feeding directly into preview, checkout, and fulfillment.",
       ],
     },
   },
@@ -1084,6 +1110,24 @@ function ViewVisual({ view }: { view: ViewState }) {
             {view.visual.installs ? (
               <span className="install-pill">{view.visual.installs}</span>
             ) : null}
+
+            {view.visual.metrics?.map((metric, index) => (
+              <span
+                key={metric.label}
+                className={
+                  index === 0 ? "visual-metric-pill" : "install-pill"
+                }
+              >
+                {index === 0 ? (
+                  <>
+                    <strong>{metric.value}</strong>
+                    <span>{metric.label}</span>
+                  </>
+                ) : (
+                  `${metric.value} ${metric.label}`
+                )}
+              </span>
+            ))}
           </div>
         </div>
       </div>

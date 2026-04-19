@@ -290,22 +290,27 @@ button {
 }
 
 .visual-icon-shell {
+  position: relative;
+  overflow: hidden;
   display: grid;
   place-items: center;
   width: 122px;
   height: 122px;
-  border-radius: 32px;
-  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 24px;
+  border: 1px solid rgb(255 255 255 / 0.08);
   background:
-    radial-gradient(circle at center, var(--state-accent-soft), transparent 54%),
-    rgb(255 255 255 / 0.03);
+    radial-gradient(circle at top, rgb(255 255 255 / 0.16), transparent 38%),
+    linear-gradient(145deg, #1b1b1f 0%, #0b0b0d 100%);
   box-shadow:
-    0 22px 44px rgb(0 0 0 / 0.28),
-    inset 0 1px 0 rgb(255 255 255 / 0.05);
+    0 16px 28px rgb(0 0 0 / 0.24),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 
 .visual-app-icon {
-  border-radius: 25px;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
 .visual-icon-text {
@@ -361,7 +366,15 @@ button {
 }
 
 .platform-text {
-  color: rgb(245 245 247 / 0.72);
+  color: rgb(245 245 247 / 0.48);
+  cursor: not-allowed;
+  border-bottom: 1px solid rgb(245 245 247 / 0.2);
+}
+
+.platform-text::after {
+  content: "↗";
+  font-size: 0.82em;
+  line-height: 1;
 }
 
 .visual-tag-line {
@@ -409,6 +422,20 @@ button {
   font-size: 0.79rem;
   font-weight: 650;
   letter-spacing: 0.04em;
+}
+
+.visual-metric-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  color: rgb(245 245 247 / 0.62);
+  font-size: 0.86rem;
+}
+
+.visual-metric-pill strong {
+  color: var(--foreground);
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .visual-brand-card {
@@ -526,7 +553,7 @@ button {
 
 .about-overview-body {
   gap: 10px;
-  max-width: 58ch;
+  max-width: none;
 }
 
 .about-overview-body p {
