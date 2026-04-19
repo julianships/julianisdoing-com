@@ -2254,3 +2254,43 @@ button {
     height: 16px;
   }
 }
+
+@media (max-width: 767px) {
+  .command-tile-about-tools {
+    min-height: 150px;
+  }
+
+  .command-tile-about-socials {
+    min-height: 162px;
+  }
+
+  .command-tile-about-tools,
+  .command-tile-about-socials {
+    padding-block: 16px;
+  }
+
+  .command-tile-about-tools .about-toolchain-tile {
+    gap: 4px;
+  }
+
+  .command-tile-about-tools .about-tool-marquee {
+    min-height: 84px;
+  }
+
+  .command-tile-about-tools .about-tool-track {
+    margin-top: -16px;
+  }
+
+  .command-tile-about-socials .about-outside-tile {
+    gap: 12px;
+  }
+
+  .command-tile-about-socials .about-outside-row {
+    gap: 8px;
+  }
+
+  .command-tile-about-socials .about-outside-pill {
+    min-height: 38px;
+    padding: 0.6rem 0.74rem;
+  }
+}

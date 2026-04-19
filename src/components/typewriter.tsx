@@ -1521,6 +1521,7 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
           <svg
             className="about-usage-chart"
             viewBox={`0 0 ${chartSize.width} ${chartSize.height}`}
+            preserveAspectRatio="none"
           >
             <defs>
               <linearGradient
@@ -1891,7 +1892,11 @@ export function Typewriter() {
               )}
             </section>
 
-            <section className="command-tile command-tile-flow">
+            <section
+              className={`command-tile command-tile-flow${
+                activeView.id === "about" ? " command-tile-about-tools" : ""
+              }`}
+            >
               <ListTile
                 view={activeView}
                 tileKey={showProjectTileSwap ? "stack" : "flow"}
@@ -1899,7 +1904,11 @@ export function Typewriter() {
               />
             </section>
 
-            <section className="command-tile command-tile-notes">
+            <section
+              className={`command-tile command-tile-notes${
+                activeView.id === "about" ? " command-tile-about-socials" : ""
+              }`}
+            >
               <ListTile view={activeView} tileKey="notes" section={activeView.notes} />
             </section>
 
