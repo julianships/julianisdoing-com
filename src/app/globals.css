@@ -2123,6 +2123,10 @@ button {
 }
 
 @media (max-width: 767px) {
+  .command-stage {
+    padding-bottom: calc(116px + env(safe-area-inset-bottom));
+  }
+
   .command-board {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2130,8 +2134,7 @@ button {
       "overview"
       "stack"
       "flow"
-      "notes"
-      "dock";
+      "notes";
   }
 
   .command-tile {
@@ -2150,7 +2153,16 @@ button {
   }
 
   .command-tile-dock {
-    padding: 12px;
+    grid-area: auto;
+    position: fixed;
+    z-index: 50;
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 12px;
+    min-height: 0;
+    padding: 14px 10px 10px;
+    border-radius: 26px;
+    backdrop-filter: blur(18px);
   }
 
   .visual-profile-photo-shell {
@@ -2256,12 +2268,13 @@ button {
   }
 
   .dock-frame {
-    gap: 12px;
+    gap: clamp(6px, 2vw, 12px);
+    justify-content: space-between;
   }
 
   .dock-app-icon {
-    width: 74px;
-    height: 74px;
+    width: clamp(54px, 16vw, 74px);
+    height: clamp(54px, 16vw, 74px);
     border-radius: 20px;
   }
 
