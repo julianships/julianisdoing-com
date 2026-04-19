@@ -388,7 +388,7 @@ const views: ViewState[] = [
       kicker: "About",
       title: "Julian Albou",
       subtitle: "AI-first software developer",
-      location: "Europe / Remote",
+      location: "Cannes, FR / Los Angeles, USA",
       mode: "profile",
       imageSrc: "/profile-assets/about-profile.jpg",
     },
@@ -559,9 +559,9 @@ const views: ViewState[] = [
     },
     overview: {
       kicker: "Overview",
-      title: "Internal engine for generating, scheduling, and learning from content.",
+      title: "Internal engine for generating, scheduling, and learning from content",
       body: [
-        "I built the Victus content ops system so organic content could scale more like software than like a manual workflow. The goal was leverage: more output, tighter iteration, less drag.",
+        "I built the Victus content ops system so organic content could scale rapidly. The goal was leverage: more output, tighter iteration, less drag.",
         "It turns ideas into generated videos, routes them through scheduling providers, and closes the loop with analytics so distribution behaves like an operating system rather than a checklist.",
       ],
       highlights: [
@@ -583,31 +583,31 @@ const views: ViewState[] = [
       kicker: "Stack",
       title: "Operating pieces.",
       items: [
-        "Project adapters and account-group abstractions to keep content workflows structured.",
-        "Generation backends that can run locally or through Modal depending on the job.",
-        "Cloudinary asset hosting plus Firestore-backed project state and reconciliation.",
-        "Upload-Post as the primary scheduling provider, with legacy PostBridge support where needed.",
+        "FFmpeg rendering for low-cost, repeatable video assembly.",
+        "Modal workers for burst generation when thousands of videos need to be rendered quickly.",
+        "Firestore-backed state for generated, scheduled, posted, and failed videos.",
+        "Custom agent skills for generation, variations, translation, sequencing, and analytics workflows.",
       ],
       cards: [
         {
-          label: "Project Adapters",
+          label: "FFmpeg",
           detail:
-            "Project adapters and account-group abstractions keep content workflows structured, so the system can scale across lanes and accounts without collapsing into ad hoc scripts.",
+            "Switching the render pipeline from CreativeMate to FFmpeg made video assembly repeatable and brought generation costs down dramatically, roughly 50x compared with the earlier approach.",
         },
         {
           label: "Modal",
           detail:
-            "Generation backends can run locally or through Modal depending on the job, which keeps heavier rendering and automation work flexible instead of forcing one execution path.",
+            "Modal let the system rent compute only when needed and fan out many FFmpeg workers at once, so large batches could be generated quickly without keeping expensive infrastructure running all the time.",
         },
         {
-          label: "Cloudinary + Firestore",
+          label: "Firestore",
           detail:
-            "Cloudinary stores the asset layer while Firestore tracks project state and reconciliation, giving the pipeline both durable media hosting and a reliable operating record.",
+            "Firestore and scheduling-server records kept the pipeline accountable across generated, scheduled, posted, and failed videos, which mattered once dozens of accounts were moving at the same time.",
         },
         {
-          label: "Upload-Post",
+          label: "Agent Skills",
           detail:
-            "Upload-Post is the main scheduling provider, with legacy PostBridge support where needed, so publishing can keep running while provider migrations happen in the background.",
+            "Custom agent skills packaged the repeatable work: generate variants, apply translations, sequence posts by region and account, work around rate limits, and pull analytics back without turning the workflow into manual ops.",
         },
       ],
     },
@@ -615,22 +615,22 @@ const views: ViewState[] = [
       kicker: "How it works",
       title: "Distribution loop.",
       items: [
-        "Start from a project, script source, or content lane instead of ad hoc one-offs.",
-        "Generate assets and render variations through a repeatable pipeline.",
-        "Schedule against the active provider, publish, and pull analytics back into the system.",
+        "Generate assets and variations using custom agent skills.",
+        "Prepare and publish months worth of content across accounts.",
+        "Analyze performance and feed the learning back into the system.",
       ],
       steps: [
         {
-          label: "Define lane",
-          detail: "Start from a project, script source, or account group.",
-        },
-        {
           label: "Render",
-          detail: "Generate assets and variations through a repeatable pipeline.",
+          detail: "Generate assets and variations using custom agent skills.",
         },
         {
-          label: "Learn",
-          detail: "Schedule, publish, and feed analytics back into the system.",
+          label: "Schedule",
+          detail: "Prepare and publish months worth of content across accounts.",
+        },
+        {
+          label: "Analyze + learn",
+          detail: "Pull performance data back into the system for iteration.",
         },
       ],
     },
@@ -638,9 +638,9 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "System constraints.",
       items: [
-        "Scale output without scaling headcount linearly.",
-        "Keep project state deterministic even when many jobs are moving at once.",
-        "Support provider migrations while treating performance data as product feedback.",
+        "Moved rendering from CreativeMate to FFmpeg, cutting video generation costs by roughly 50x.",
+        "Scaled repeatable generation and scheduling across dozens of accounts posting up to 25 times per day.",
+        "Used Modal workers, database state, and analytics to track generated, scheduled, posted, and failed videos.",
       ],
     },
   },
@@ -669,10 +669,10 @@ const views: ViewState[] = [
     },
     overview: {
       kicker: "Overview",
-      title: "Prayer-first blocker that turns distraction into ritual.",
+      title: "Prayer-first blocker that turns distraction into ritual",
       body: [
-        "Praise Lock blocks distracting apps, reroutes the moment into a guided prayer flow, and hands the user back with a cleaner reset instead of another doomscroll.",
-        "It’s a good second signal because it mixes native permissions, cross-platform mobile work, generated content, and subscription infrastructure inside one focused product.",
+        "Praise Lock blocks distracting apps, reroutes the moment into a guided prayer flow, and hands the user back with more intention instead of another mindless doomscroll.",
+        "Behind the simple prayer loop is a fairly complex system: native app blocking and permissions, AI-generated prayers, streaks, local reminders, subscriptions, and analytics all working together without making the experience feel transactional.",
       ],
       highlights: [
         "App lock integrations",
@@ -693,31 +693,31 @@ const views: ViewState[] = [
       kicker: "Stack",
       title: "What powers it.",
       items: [
-        "Flutter / Dart with Riverpod and go_router for a focused mobile flow.",
-        "iOS Family Controls plus Android accessibility and usage-access integrations.",
-        "SharedPreferences and Sqflite-backed storage for blocked apps and prayer history.",
-        "RevenueCat, Superwall, Mixpanel, and Firebase analytics around subscriptions and behavior.",
+        "Flutter, Riverpod, and go_router for the onboarding, gate, prayer, paywall, and settings flows.",
+        "iOS Screen Time APIs: FamilyControls, ManagedSettings, DeviceActivity, and Shield extensions.",
+        "Prayer API plus Sqflite history so generated prayers can respond to mood, faith state, and recent verses.",
+        "RevenueCat, Superwall, Mixpanel, Firebase, Singular, and Smartlook around subscriptions and behavior.",
       ],
       cards: [
         {
           label: "Flutter",
           detail:
-            "Praise Lock uses Flutter and Dart with Riverpod and go_router to keep the prayer flow, state management, and cross-platform UX consistent across iOS and Android.",
+            "Flutter, Riverpod, and go_router hold the core product together: onboarding, lock setup, blocked-app gate, prayer, paywall, settings, and native app-lock events all route through one app state model.",
         },
         {
-          label: "Permissions Layer",
+          label: "Screen Time APIs",
           detail:
-            "iOS Family Controls and Android accessibility and usage-access integrations are the hard native layer that make blocking, rerouting, and recovery flows actually work.",
+            "The iOS blocking layer uses FamilyControls, ManagedSettings, DeviceActivity, and Shield extensions, with shared App Group state to keep selected apps, shield actions, notifications, and emergency unlocks in sync.",
         },
         {
-          label: "Local Storage",
+          label: "Prayer Engine",
           detail:
-            "SharedPreferences and Sqflite store blocked apps, prayer history, and local state so the app can react immediately without depending on network round-trips.",
+            "The prayer API takes mood, relationship-with-God input, and recent prayer history, then avoids repeating recent verses and books. Sqflite stores the prayer history so streaks and personalization can rebuild locally.",
         },
         {
-          label: "Monetization + Analytics",
+          label: "RevenueCat + Superwall",
           detail:
-            "RevenueCat, Superwall, Mixpanel, and Firebase analytics tie subscriptions to behavior data, which helps pricing and retention decisions stay connected to real usage.",
+            "RevenueCat and Superwall handle subscription access and paywall experiments, while Mixpanel, Firebase, Singular, and Smartlook keep onboarding, purchase, retention, and diagnostic signals visible.",
         },
       ],
     },
@@ -748,9 +748,9 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "Key build decisions.",
       items: [
-        "Reconciling very different iOS and Android permission models cleanly.",
-        "Making every blocked-app or notification route land in the right prayer state.",
-        "Keeping generated prayers fresh while introducing subscriptions without cheapening the product.",
+        "Turned iOS Screen Time constraints into a clean prayer loop instead of a confusing permission wall.",
+        "Kept shield actions, deep links, and emergency unlocks reliable across native extensions and Flutter.",
+        "Balanced AI prayers, streaks, notifications, and paywalls without making prayer feel transactional.",
       ],
     },
   },
@@ -801,31 +801,31 @@ const views: ViewState[] = [
       kicker: "Stack",
       title: "What powers the funnel.",
       items: [
-        "Next.js 15, TypeScript, and Tailwind driving the web product and landing-page surface.",
-        "Supabase for auth, PostgreSQL data, storage, gated flows, and order state.",
-        "Stripe checkout plus webhook-driven confirmation and recovery.",
-        "Custom FLUX-based generation pipeline, lifecycle email automation, and Vercel deployment.",
+        "Next.js, TypeScript, Tailwind, and next-intl for the product flow plus localized acquisition pages.",
+        "Supabase for auth, PostgreSQL order state, selfie uploads, generated results, and gated delivery.",
+        "Stripe plus Datafast/GA attribution connecting SEO visits, free previews, checkout, and paid revenue signals.",
+        "Fal.ai Nano Banana 2 generation pipeline with preview promotion, job reconciliation, and stored final galleries.",
       ],
       cards: [
         {
           label: "Next.js",
           detail:
-            "Next.js 15, TypeScript, and Tailwind power both the product flow and the landing-page surface, so acquisition and conversion work live in the same system.",
+            "Next.js, TypeScript, Tailwind, and next-intl power the paid product flow and the localized SEO/city pages, so acquisition and conversion live in the same system.",
         },
         {
           label: "Supabase",
           detail:
-            "Supabase handles auth, PostgreSQL data, storage, gated flows, and order state, which keeps the customer journey grounded in one operational backend.",
+            "Supabase handles auth, PostgreSQL order state, selfie uploads, generated results, and gated delivery, keeping the whole customer journey grounded in one backend.",
         },
         {
-          label: "Stripe",
+          label: "Stripe + Datafast",
           detail:
-            "Stripe checkout and webhook-driven confirmation handle payment, recovery, and post-purchase state changes so the handoff into generation stays trustworthy.",
+            "Stripe checkout, webhooks, Datafast, and GA metadata keep the SEO-to-preview-to-payment funnel measurable through paid delivery.",
         },
         {
-          label: "Generation Pipeline",
+          label: "Fal Pipeline",
           detail:
-            "A custom FLUX-based generation pipeline, lifecycle email automation, and Vercel deployment keep delivery reliable after purchase instead of treating generation like a black box.",
+            "Fal.ai Nano Banana 2 powers the current generation path, replacing the more expensive LoRA-training approach and making cheap free previews viable.",
         },
       ],
     },
@@ -833,14 +833,14 @@ const views: ViewState[] = [
       kicker: "How it works",
       title: "Customer journey.",
       items: [
-        "Acquire through focused landing pages, SEO, and paid traffic.",
+        "Acquire through localized SEO pages and high-intent resume-photo searches.",
         "Collect 8 to 20 selfies plus style selections before generation starts.",
         "Move from payment into processing cleanly and deliver a usable final gallery.",
       ],
       steps: [
         {
           label: "Acquire",
-          detail: "Bring visitors through focused landing pages, SEO, and paid traffic.",
+          detail: "Bring visitors through localized SEO pages and high-intent searches.",
         },
         {
           label: "Collect",
@@ -856,9 +856,9 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "Product constraints.",
       items: [
-        "Finding the right balance between funnel friction and output quality.",
-        "Making previews convert without making the product feel low-trust.",
-        "Keeping watermarking, preview-to-paid handoff, and localization analytics coherent.",
+        "Rebuilt an acquired starter codebase into a product I could actually operate: new backend, order state, and processing pipeline.",
+        "Moved from user-trained LoRA models to Fal.ai Nano Banana 2, cutting generation costs by roughly 20x and making free previews viable.",
+        "Made SEO the acquisition engine with localized pages feeding into preview, checkout, and delivery instead of a paid-traffic loop.",
       ],
     },
   },
@@ -1238,12 +1238,27 @@ function OverviewAside({ view }: { view: ViewState }) {
   if (view.overview.aside === "content-ops") {
     return (
       <div className="overview-aside overview-aside-ops" aria-hidden="true">
-        <div className="ops-flow-diagram">
-          {["Prompt", "Render", "Schedule", "Analyze"].map((step) => (
-            <div key={step} className="ops-flow-card">
-              {step}
-            </div>
-          ))}
+        <div className="overview-ops-video-shell">
+          <div className="overview-ops-demo-frame">
+            <video
+              className="overview-ops-demo-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/projects/content-ops/overview-demo-poster.webp?v=20260419a"
+            >
+              <source
+                src="/projects/content-ops/overview-demo.webm?v=20260419a"
+                type="video/webm"
+              />
+              <source
+                src="/projects/content-ops/overview-demo.mp4?v=20260419a"
+                type="video/mp4"
+              />
+            </video>
+          </div>
         </div>
       </div>
     );
