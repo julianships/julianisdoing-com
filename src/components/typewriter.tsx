@@ -729,7 +729,7 @@ const views: ViewState[] = [
         {
           label: "gemini-3-flash-preview",
           detail:
-            "The prayer API runs on gemini-3-flash-preview today, with a second Flash-style model being added as a fallback. It takes mood, relationship-with-God input, and recent prayer history, then retries against repeated verses and books while Sqflite keeps history local for streaks and personalization.",
+            "The prayer API runs on Gemini 3 Flash Preview, with Grok 4.1 Fast as fallback. It uses mood, relationship-with-God input, and recent prayer history, then retries to avoid repeated verses while Sqflite keeps local history for streaks and personalization.",
         },
         {
           label: "RevenueCat + Superwall",
