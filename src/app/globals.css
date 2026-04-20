@@ -2026,13 +2026,17 @@ button {
 }
 
 @media (max-width: 1399px) {
+  .command-stage {
+    --floating-dock-slot: clamp(164px, 15vw, 196px);
+    padding-bottom: calc(var(--floating-dock-slot) + env(safe-area-inset-bottom));
+  }
+
   .command-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       "visual overview"
       "stack stack"
-      "flow notes"
-      "dock dock";
+      "flow notes";
   }
 
   .command-tile-visual {
@@ -2061,8 +2065,16 @@ button {
   }
 
   .command-tile-dock {
-    grid-area: dock;
+    grid-area: auto;
+    position: fixed;
+    z-index: 50;
+    right: 24px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 24px;
     min-height: 132px;
+    padding: 14px 18px;
+    border-radius: 26px;
+    backdrop-filter: blur(18px);
   }
 
   .overview-layout-with-aside {
@@ -2123,9 +2135,76 @@ button {
   }
 }
 
+@media (min-width: 768px) and (max-width: 1399px) {
+  .command-tile-project-demo {
+    height: clamp(420px, 44vw, 560px);
+    min-height: 0;
+  }
+
+  .command-tile-project-photocv {
+    height: clamp(500px, 49vw, 660px);
+  }
+
+  .command-tile-project-demo .demo-tile-swap,
+  .command-tile-project-demo .project-demo-tile,
+  .command-tile-project-demo .overview-aside {
+    height: 100%;
+  }
+
+  .command-tile-project-photocv .overview-aside-photocv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(28px, 3.2vw, 42px);
+    padding: 18px;
+  }
+
+  .command-tile-project-photocv .overview-photocv-wordmark-shell {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: 2;
+    padding-inline: 0;
+    transform: none;
+  }
+
+  .command-tile-project-photocv .overview-photocv-wordmark {
+    width: clamp(150px, 16vw, 190px);
+  }
+
+  .command-tile-project-photocv .overview-photocv-video-shell {
+    flex: 0 0 auto;
+  }
+
+  .command-tile-project-photocv .overview-photocv-demo-frame {
+    width: clamp(250px, 30vw, 340px);
+    max-width: 100%;
+  }
+
+  .command-tile-project-photocv .photocv-home-carousel {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: clamp(118px, 10vw, 148px);
+  }
+
+  .command-tile-project-content-ops .overview-ops-video-shell {
+    height: 100%;
+  }
+
+  .command-tile-project-content-ops .overview-ops-demo-frame {
+    width: min(82%, 880px, calc(76vw - 70px));
+    height: auto;
+    max-width: calc(100% - 36px);
+    aspect-ratio: 16 / 9;
+  }
+}
+
 @media (max-width: 767px) {
   .command-stage {
-    padding-bottom: calc(116px + env(safe-area-inset-bottom));
+    --floating-dock-slot: clamp(132px, 30vw, 156px);
+    padding-bottom: calc(var(--floating-dock-slot) + env(safe-area-inset-bottom));
   }
 
   .command-board {

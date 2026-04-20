@@ -1924,7 +1924,13 @@ export function Typewriter() {
               <OverviewTile view={activeView} />
             </section>
 
-            <section className="command-tile command-tile-stack">
+            <section
+              className={`command-tile command-tile-stack${
+                showProjectTileSwap
+                  ? ` command-tile-project-demo command-tile-project-${activeView.id}`
+                  : ""
+              }`}
+            >
               {showProjectTileSwap ? (
                 <ProjectDemoTile view={activeView} />
               ) : (
