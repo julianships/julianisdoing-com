@@ -609,7 +609,7 @@ const views: ViewState[] = [
         {
           label: "FFmpeg",
           detail:
-            "Switching the render pipeline from CreativeMate to FFmpeg made video assembly repeatable and brought generation costs down dramatically, roughly 50x compared with the earlier approach.",
+            "Switching the render pipeline from Creatomate to FFmpeg made video assembly repeatable and brought generation costs down dramatically, roughly 50x compared with the earlier approach.",
         },
         {
           label: "Modal",
@@ -655,7 +655,7 @@ const views: ViewState[] = [
       kicker: "What mattered",
       title: "System constraints.",
       items: [
-        "Moved rendering from CreativeMate to FFmpeg, cutting video generation costs by roughly 50x.",
+        "Moved rendering from Creatomate to FFmpeg, cutting video generation costs by roughly 50x.",
         "Scaled repeatable generation and scheduling across dozens of accounts posting up to 25 times per day.",
         "Used Modal workers, database state, and analytics to track generated, scheduled, posted, and failed videos.",
       ],
@@ -712,7 +712,7 @@ const views: ViewState[] = [
       items: [
         "Flutter, Riverpod, and go_router for the onboarding, gate, prayer, paywall, and settings flows.",
         "iOS Screen Time APIs: FamilyControls, ManagedSettings, DeviceActivity, and Shield extensions.",
-        "Prayer API plus Sqflite history so generated prayers can respond to mood, faith state, and recent verses.",
+        "Gemini LLM pipeline plus Sqflite history so generated prayers can respond to mood, faith state, and recent verses.",
         "RevenueCat, Superwall, Mixpanel, Firebase, Singular, and Smartlook around subscriptions and behavior.",
       ],
       cards: [
@@ -727,9 +727,9 @@ const views: ViewState[] = [
             "The iOS blocking layer uses FamilyControls, ManagedSettings, DeviceActivity, and Shield extensions, with shared App Group state to keep selected apps, shield actions, notifications, and emergency unlocks in sync.",
         },
         {
-          label: "Prayer Engine",
+          label: "gemini-3-flash-preview",
           detail:
-            "The prayer API takes mood, relationship-with-God input, and recent prayer history, then avoids repeating recent verses and books. Sqflite stores the prayer history so streaks and personalization can rebuild locally.",
+            "The prayer API runs on gemini-3-flash-preview today, with a second Flash-style model being added as a fallback. It takes mood, relationship-with-God input, and recent prayer history, then retries against repeated verses and books while Sqflite keeps history local for streaks and personalization.",
         },
         {
           label: "RevenueCat + Superwall",
