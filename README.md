@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# julianisdoing.com
 
-## Getting Started
+Source for [julianalbou.com](https://www.julianalbou.com), a personal portfolio site built with Next.js.
 
-First, run the development server:
+The site is meant to do two jobs:
+
+- present a clear public view of the products I have shipped
+- act as a lightweight project index for live work like Victus, Praise Lock, PhotoCV.ai, and internal systems such as Victus Content Ops
+
+This repo is the website layer only. It is not a public dump of the underlying commercial product repos.
+
+## Stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Framer Motion
+- custom CSS
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+src/app/
+  layout.tsx         Site metadata and root layout
+  page.tsx           Main portfolio route
+  links/             Secondary links page
 
-## Learn More
+src/components/
+  typewriter.tsx     Main interactive portfolio experience
+  ui/                Shared UI primitives
 
-To learn more about Next.js, take a look at the following resources:
+public/
+  profile-assets/    Profile imagery
+  projects/          Project-specific media
+  tool-logos/        Tool and stack logos
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What the site emphasizes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- a concise personal intro
+- shipped products instead of speculative concepts
+- product context, metrics, and technical constraints
+- visual walkthroughs that make the work legible quickly
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Some live products shown on the site are backed by private commercial repos.
+- This repo focuses on the public presentation layer and associated assets.
+- Internal planning files and local agent-tooling config are intentionally not part of the public-facing project story.

@@ -19,12 +19,21 @@
 /.playwright-cli/
 /output/
 
+# local tooling / planning
+/.cursor/
+/.roo/
+/.taskmaster/
+.roomodes
+PRD_Julian_Is_Doing_Website.md
+
 # production
 /build
 
 # misc
 .DS_Store
 *.pem
+victus promo.png
+/public/projects/victus/promo.png
 
 # debug
 npm-debug.log*
