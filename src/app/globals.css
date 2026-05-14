@@ -515,10 +515,33 @@ button {
 
 .about-overview-layout {
   align-items: start;
+  min-height: 0;
 }
 
 .about-overview-copy {
   gap: 14px;
+  max-height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-color: rgb(245 245 247 / 0.28) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.about-overview-copy::-webkit-scrollbar {
+  width: 6px;
+}
+
+.about-overview-copy::-webkit-scrollbar-track {
+  background: rgb(255 255 255 / 0.035);
+  border-radius: 999px;
+}
+
+.about-overview-copy::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(245 245 247 / 0.26);
 }
 
 .overview-title {
@@ -2017,7 +2040,7 @@ button {
 
 @media (min-width: 1536px) {
   .command-board {
-    grid-template-rows: 296px 296px 210px;
+    grid-template-rows: clamp(296px, 29.5vh, 318px) clamp(296px, 29.5vh, 318px) 210px;
   }
 
   .overview-layout-with-aside {
