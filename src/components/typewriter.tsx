@@ -393,24 +393,24 @@ const views: ViewState[] = [
     visual: {
       kicker: "About",
       title: "Julian Albou",
-      subtitle: "AI-first software developer",
+      subtitle: "AI-native builder and operator",
       location: "Cannes, FR / Los Angeles, USA",
       mode: "profile",
       imageSrc: "/profile-assets/about-profile.jpg",
     },
     overview: {
-      title: "Developer first. Generalist by range.",
+      title: "Products, systems, and GTM loops.",
       body: [
-        "I build mobile apps, monetized web products, and the internal systems around them. Currently focused on Victus, a gamified self-improvement app with an automated pipeline for video generation, posting, and analytics behind it.",
-        "The way I build is AI-native. I treat agentic tools as the primary execution layer and spend my time on architecture, product decisions, and the tradeoffs that determine whether something ships.",
-        "I came to this full-time a year ago, after several years at a high-growth startup across business development, sales, growth, product, and design. That range taught me how to operate with ambiguity, move fast with limited resources, and care about outcomes end to end.",
-        "I'm French-American, born in Paris and raised in Los Angeles, and I think that shaped a lot of how I work. I'm naturally curious, drawn to fast-moving environments, and happiest around smart people building hard things.",
+        "I build products, automation systems, and distribution loops with AI as my execution layer. The current work spans mobile apps, monetized AI web products, and internal systems that turn messy operations into repeatable workflows.",
+        "Before building full-time, I spent five years in Web3 across business development, partnerships, GTM, product, and operator roles, including ApeSwap and ApeBond.",
+        "That range is the point: product taste, technical execution, distribution, monetization, and commercial judgment in the same person.",
+        "I’m French-American, born in Paris and raised in Los Angeles. I’m drawn to fast-moving environments, ambitious people, and work where ideas have to become shipped systems.",
       ],
       highlights: [
-        "Developer",
-        "Mobile + web",
+        "AI-native builder",
+        "Operator",
+        "Product + GTM",
         "Automation systems",
-        "Shipped products",
       ],
     },
     stack: {
