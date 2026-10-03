@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -60,6 +61,15 @@ test("probe discovers active and archived rollouts without emitting content", ()
   assert.equal(parsed.complete, true);
   assert.equal(output.includes("must never leave the host"), false);
   assert.equal(output.includes(root), false);
+  const compressed = execFileSync("python3", ["scripts/token_usage_probe.py", config, "--gzip"]);
+  const decoded = gunzipSync(compressed).toString("utf8");
+  const zipped = JSON.parse(decoded);
+  const { collectedAt: plainAt, ...plainEvidence } = parsed;
+  const { collectedAt: gzipAt, ...gzipEvidence } = zipped;
+  assert.ok(plainAt && gzipAt);
+  assert.deepEqual(gzipEvidence, plainEvidence);
+  assert.equal(decoded.includes("must never leave the host"), false);
+  assert.equal(decoded.includes(root), false);
 });
 
 test("response lifetime totals reconcile despite a reduced context counter", () => {
@@ -79,6 +89,16 @@ test("response lifetime totals reconcile despite a reduced context counter", () 
   const parsed = JSON.parse(execFileSync("python3", ["scripts/token_usage_probe.py", config], { encoding: "utf8" }));
   assert.equal(parsed.complete, true);
   assert.equal(parsed.codexResponses.reduce((sum, row) => sum + row.total, 0), 130);
+});
+
+test("gzip transport preserves exact content-free probe evidence", () => {
+  const payload = Buffer.from(JSON.stringify({ codexHomes: [], hermesDatabases: [] })).toString("base64url");
+  const bytes = execFileSync("python3", ["scripts/token_usage_probe.py", payload, "--gzip"]);
+  const evidence = JSON.parse(gunzipSync(bytes).toString("utf8"));
+  assert.equal(evidence.schemaVersion, 2);
+  assert.equal(evidence.complete, true);
+  assert.deepEqual(evidence.componentComplete, { codex: true, hermes: true });
+  assert.deepEqual(evidence.codexTransitions, []);
 });
 
 test("probe marks missing configured sources incomplete instead of fresh-empty", () => {

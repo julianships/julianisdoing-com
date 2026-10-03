@@ -3,6 +3,8 @@
 
 import base64
 import datetime
+import gzip
+import io
 import hashlib
 import json
 import os
@@ -382,8 +384,8 @@ def collect_hermes_database(path, rows_by_key, stats):
 
 
 def main():
-    if len(sys.argv) != 2:
-        raise SystemExit("probe configuration argument required")
+    if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--gzip"):
+        raise SystemExit("probe configuration argument and optional --gzip required")
     encoded = sys.argv[1]
     encoded += "=" * (-len(encoded) % 4)
     config = json.loads(base64.urlsafe_b64decode(encoded.encode("ascii")))
@@ -427,8 +429,14 @@ def main():
         "hermesRows": list(hermes_rows.values()),
         "stats": stats,
     }
-    json.dump(output, sys.stdout, separators=(",", ":"), sort_keys=True)
-    sys.stdout.write("\n")
+    if len(sys.argv) == 3:
+        with gzip.GzipFile(fileobj=sys.stdout.buffer, mode="wb", mtime=0) as compressed:
+            with io.TextIOWrapper(compressed, encoding="utf-8") as text:
+                json.dump(output, text, separators=(",", ":"), sort_keys=True)
+                text.write("\n")
+    else:
+        json.dump(output, sys.stdout, separators=(",", ":"), sort_keys=True)
+        sys.stdout.write("\n")
 
 
 if __name__ == "__main__":

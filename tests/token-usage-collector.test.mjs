@@ -125,6 +125,22 @@ test("collector reports an incomplete probe and recovers a dead-owner lock", () 
   assert.equal(existsSync(lockPath), false);
 });
 
+test("custom lock cannot bypass the shared state lock", () => {
+  const directory = mkdtempSync(join(tmpdir(), "token-canonical-lock-"));
+  const configPath = join(directory, "config.json");
+  const statePath = join(directory, "state.json");
+  writeFileSync(configPath, JSON.stringify({ requiredSourceCount: 1, sources: [{
+    id: "private-a", publicLabel: "source-1", attested: true,
+    transport: { type: "local", python: "python3" }, codexHomes: [], hermesDatabases: [],
+  }] }));
+  writeFileSync(`${statePath}.lock`, `${process.pid}\n`);
+  const result = spawnSync("node", ["scripts/collect-token-usage.mjs", "--config", configPath,
+    "--state", statePath, "--output", join(directory, "feed.json"), "--lock", join(directory, "custom.lock")], { encoding: "utf8" });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /live process/);
+  assert.equal(existsSync(statePath), false);
+});
+
 test("collector never removes a live owner's lock", () => {
   const directory = mkdtempSync(join(tmpdir(), "token-collector-live-lock-"));
   const configPath = join(directory, "config.json");

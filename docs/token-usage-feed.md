@@ -21,7 +21,7 @@ Historical Hermes rows do not contain a credential-pool identity, so configured 
 
 Copy the example configuration to an ignored private file. Set `requiredSourceCount` to the authorized inventory size and define every independently polled runtime as a source; collection is rejected if the counts differ. A source must remain `attested: false` until the owner has reviewed its runtime/account scope. Unattested evidence is retained privately but excluded from the public total and reported as `unverified`. Keep private source IDs, hostnames, local paths, account inspection, and SSH details out of public files. Public labels must be contiguous generic `source-N` values.
 
-The collector invokes a small Python probe locally or over SSH using configured argument arrays. It never constructs a shell command. The remote probe reads active and archived Codex rollouts plus selected Hermes databases and returns only hashes, timestamps, cumulative numeric counters, and diagnostics. Prompts, transcript content, instructions, paths, account identifiers, and credentials never leave the source host.
+The collector invokes a small Python probe locally or over SSH using configured argument arrays. It never constructs a shell command. Probe output uses gzip transport with bounded decompression to avoid slow historical-evidence transfers. The remote probe reads active and archived Codex rollouts plus selected Hermes databases and returns only hashes, timestamps, cumulative numeric counters, and diagnostics. Prompts, transcript content, instructions, paths, account identifiers, and credentials never leave the source host.
 
 ```bash
 npm run token-usage:collect -- \
@@ -32,7 +32,7 @@ npm run token-usage:collect -- \
   --lock .token-tracker-evidence/collector.lock
 ```
 
-Private state is written atomically with mode `0600`. It retains the last good source snapshot when a host is disconnected, a required schema is unavailable, or logs are archived, moved, or deleted. Missing/unreadable configured inputs and reconciliation mismatches produce an `incomplete` source rather than a fresh empty source. Recovery merges stable evidence, so it does not recount old usage. The lock rejects a live concurrent owner and safely recovers a dead owner by PID/process-start identity.
+Private state is written atomically with mode `0600`. It retains the last good source snapshot when a host is disconnected, a required schema is unavailable, or logs are archived, moved, or deleted. Missing/unreadable configured inputs and reconciliation mismatches produce an `incomplete` source rather than a fresh empty source. Recovery merges stable evidence, so it does not recount old usage. The lock rejects a live concurrent owner and safely recovers a dead owner by PID/process-start identity. Every invocation also takes the canonical state-file lock, so a custom lock cannot bypass another writer of the same state.
 
 ## Publishing and verification
 

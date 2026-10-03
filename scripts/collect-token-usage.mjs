@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { gunzipSync } from "node:zlib";
 import { spawnSync } from "node:child_process";
 import {
   closeSync,
@@ -112,8 +113,7 @@ function runProbe(source) {
   const timeout = Math.min(Math.max(Number(source.timeoutSeconds) || 120, 10), 900) * 1_000;
   let result;
   if (source.transport.type === "local") {
-    result = spawnSync(source.transport.python ?? "python3", [PROBE_PATH, payload], {
-      encoding: "utf8",
+    result = spawnSync(source.transport.python ?? "python3", [PROBE_PATH, payload, "--gzip"], {
       maxBuffer: 64 * 1024 * 1024,
       timeout,
     });
@@ -121,9 +121,8 @@ function runProbe(source) {
     const [executable, ...sshArguments] = source.transport.argv;
     result = spawnSync(
       executable,
-      [...sshArguments, ...source.transport.command, payload],
+      [...sshArguments, ...source.transport.command, payload, "--gzip"],
       {
-        encoding: "utf8",
         input: readFileSync(PROBE_PATH, "utf8"),
         maxBuffer: 64 * 1024 * 1024,
         timeout,
@@ -134,7 +133,9 @@ function runProbe(source) {
   if (result.status !== 0) {
     throw new Error(`probe exited ${result.status}: ${String(result.stderr).trim().slice(0, 240)}`);
   }
-  const probe = JSON.parse(result.stdout);
+  const probe = JSON.parse(gunzipSync(result.stdout, {
+    maxOutputLength: 128 * 1024 * 1024,
+  }).toString("utf8"));
   if (probe.schemaVersion !== 2 || typeof probe.complete !== "boolean"
     || typeof probe.componentComplete?.codex !== "boolean"
     || typeof probe.componentComplete?.hermes !== "boolean"
@@ -229,8 +230,11 @@ function acquireLock(path) {
 async function main() {
   const args = parseArguments(process.argv.slice(2));
   const config = validateConfig(readJson(args.config));
-  const releaseLock = acquireLock(resolve(args.lock ?? `${args.state}.lock`));
+  const stateLock = resolve(`${args.state}.lock`);
+  const releaseLocks = [acquireLock(stateLock)];
   try {
+    const extraLock = args.lock && resolve(args.lock);
+    if (extraLock && extraLock !== stateLock) releaseLocks.push(acquireLock(extraLock));
     const priorState = existsSync(args.state)
       ? readJson(args.state)
       : { schemaVersion: 1, sources: {} };
@@ -303,7 +307,7 @@ async function main() {
     if (args.summary) writePrivateJson(args.summary, summary);
     process.stdout.write(`${JSON.stringify(summary)}\n`);
   } finally {
-    releaseLock();
+    for (const release of releaseLocks.reverse()) release();
   }
 }
 
