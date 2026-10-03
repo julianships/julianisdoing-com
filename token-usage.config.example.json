@@ -1,0 +1,29 @@
+{
+  "requiredSourceCount": 2,
+  "sources": [
+    {
+      "id": "private-local-runtime",
+      "publicLabel": "source-1",
+      "attested": true,
+      "timeoutSeconds": 120,
+      "transport": { "type": "local", "python": "python3" },
+      "codexHomes": ["/private/path/to/codex-home"],
+      "hermesDatabases": ["/private/path/to/hermes-state.db"]
+    },
+    {
+      "id": "private-remote-runtime",
+      "publicLabel": "source-2",
+      "attested": false,
+      "timeoutSeconds": 600,
+      "transport": {
+        "type": "ssh",
+        "argv": [
+          "ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", "remote-alias"
+        ],
+        "command": ["python3", "-"]
+      },
+      "codexHomes": ["/private/remote/codex-home"],
+      "hermesDatabases": ["/private/remote/hermes-state.db"]
+    }
+  ]
+}
