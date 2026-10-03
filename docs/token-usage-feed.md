@@ -32,7 +32,7 @@ npm run token-usage:collect -- \
   --lock .token-tracker-evidence/collector.lock
 ```
 
-Private state is written atomically with mode `0600`. It retains the last good source snapshot when a host is disconnected, a required schema is unavailable, or logs are archived, moved, or deleted. Missing/unreadable configured inputs and reconciliation mismatches produce an `incomplete` source rather than a fresh empty source. Recovery merges stable evidence, so it does not recount old usage. The lock rejects a live concurrent owner and safely recovers a dead owner by PID/process-start identity.
+Private state is written atomically with mode `0600`. It retains the last good source snapshot when a host is disconnected, a required schema is unavailable, or logs are archived, moved, or deleted. Missing/unreadable configured inputs and reconciliation mismatches produce an `incomplete` source rather than a fresh empty source. Recovery merges stable evidence, so it does not recount old usage. The lock rejects a live concurrent owner and safely recovers a dead owner by PID/process-start identity. Every invocation also takes the canonical state-file lock, so a custom lock cannot bypass another writer of the same state.
 
 ## Publishing and verification
 

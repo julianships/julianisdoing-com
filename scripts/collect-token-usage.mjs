@@ -230,8 +230,11 @@ function acquireLock(path) {
 async function main() {
   const args = parseArguments(process.argv.slice(2));
   const config = validateConfig(readJson(args.config));
-  const releaseLock = acquireLock(resolve(args.lock ?? `${args.state}.lock`));
+  const stateLock = resolve(`${args.state}.lock`);
+  const releaseLocks = [acquireLock(stateLock)];
   try {
+    const extraLock = args.lock && resolve(args.lock);
+    if (extraLock && extraLock !== stateLock) releaseLocks.push(acquireLock(extraLock));
     const priorState = existsSync(args.state)
       ? readJson(args.state)
       : { schemaVersion: 1, sources: {} };
@@ -304,7 +307,7 @@ async function main() {
     if (args.summary) writePrivateJson(args.summary, summary);
     process.stdout.write(`${JSON.stringify(summary)}\n`);
   } finally {
-    releaseLock();
+    for (const release of releaseLocks.reverse()) release();
   }
 }
 
