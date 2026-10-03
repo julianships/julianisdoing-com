@@ -26,6 +26,9 @@ npm run dev
 
 Then open `http://localhost:3000`.
 
+The aggregate token counter's local collector, feed contract, and owner-run
+publishing checklist are documented in [docs/token-usage-feed.md](docs/token-usage-feed.md).
+
 ## Project structure
 
 ```text

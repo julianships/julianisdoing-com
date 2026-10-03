@@ -18,6 +18,9 @@
 /out/
 /.playwright-cli/
 /output/
+/.token-tracker-evidence/
+/.token-usage.config.json
+/usage.json
 
 # local tooling / planning
 /.cursor/

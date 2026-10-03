@@ -17,6 +17,7 @@ import {
   siX,
   siYoutube,
 } from "simple-icons";
+import { useTokenUsage } from "@/lib/use-token-usage";
 
 type ViewId =
   | "about"
@@ -152,25 +153,56 @@ const photocvPairs = [
 
 const photocvRailPairs = [...photocvPairs, ...photocvPairs];
 
-const aboutUsageSnapshot = {
-  total: "30.9B+",
-  last30: "21.8B",
-} as const;
-
 const aboutUsageTrend = [
-  { month: "May", cumulative: 0 },
-  { month: "Jun", cumulative: 277286568 },
-  { month: "Jul", cumulative: 1213970146 },
-  { month: "Aug", cumulative: 1276077379 },
-  { month: "Sep", cumulative: 1543081436 },
-  { month: "Oct", cumulative: 1548065964 },
-  { month: "Nov", cumulative: 1549592483 },
-  { month: "Dec", cumulative: 1749530909 },
-  { month: "Jan", cumulative: 3963400865 },
-  { month: "Feb", cumulative: 6731271332 },
-  { month: "Mar", cumulative: 21300888908 },
-  { month: "Apr", cumulative: 30957682820 },
+  { date: "2025-05-01", month: "May", cumulative: 0 },
+  { date: "2025-06-01", month: "Jun", cumulative: 277286568 },
+  { date: "2025-07-01", month: "Jul", cumulative: 1213970146 },
+  { date: "2025-08-01", month: "Aug", cumulative: 1276077379 },
+  { date: "2025-09-01", month: "Sep", cumulative: 1543081436 },
+  { date: "2025-10-01", month: "Oct", cumulative: 1548065964 },
+  { date: "2025-11-01", month: "Nov", cumulative: 1549592483 },
+  { date: "2025-12-01", month: "Dec", cumulative: 1749530909 },
+  { date: "2026-01-01", month: "Jan", cumulative: 3963400865 },
+  { date: "2026-02-01", month: "Feb", cumulative: 6731271332 },
+  { date: "2026-03-01", month: "Mar", cumulative: 21300888908 },
+  { date: "2026-04-18", month: "Apr", cumulative: 30957682820 },
 ] as const;
+
+function formatTokenCount(tokens: number, alwaysPlus = false) {
+  const units = [
+    { threshold: 1_000_000_000, suffix: "B" },
+    { threshold: 1_000_000, suffix: "M" },
+    { threshold: 1_000, suffix: "K" },
+  ];
+  const unit = units.find(({ threshold }) => tokens >= threshold);
+  if (!unit) return `${tokens.toLocaleString("en-US")}${alwaysPlus ? "+" : ""}`;
+  const value = Math.floor((tokens / unit.threshold) * 10) / 10;
+  return `${value.toFixed(1)}${unit.suffix}${alwaysPlus ? "+" : ""}`;
+}
+
+function formatUtcDate(timestamp: string | null) {
+  if (!timestamp) return null;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(timestamp));
+}
+
+function formatSyncFreshness(timestamp: string, checkedAt: string, stale: boolean) {
+  const minutes = Math.max(
+    0,
+    Math.floor((Date.parse(checkedAt) - Date.parse(timestamp)) / 60_000),
+  );
+  const age = minutes < 1
+    ? "just now"
+    : minutes < 60
+      ? `${minutes}m ago`
+      : minutes < 1_440
+        ? `${Math.floor(minutes / 60)}h ago`
+        : `${Math.floor(minutes / 1_440)}d ago`;
+  return `${stale ? "Last sync" : "Synced"} ${age}`;
+}
 
 function buildUsageChart(
   series: readonly { month: string; cumulative: number }[],
@@ -1491,6 +1523,7 @@ function OverviewTile({ view }: { view: ViewState }) {
 }
 
 function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
+  const usage = useTokenUsage();
   const chartId = useId().replace(/:/g, "");
   const chartRegionRef = useRef<HTMLDivElement | null>(null);
   const [chartSize, setChartSize] = useState({
@@ -1524,8 +1557,16 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
     return () => observer.disconnect();
   }, [compact]);
 
+  const liveTrend = usage.observed.tokens > 0 ? [{
+    date: usage.observed.capturedAt.slice(0, 10),
+    month: formatUtcDate(usage.observed.capturedAt) ?? "Now",
+    cumulative: usage.totalTokens,
+  }] : [];
+  const usageTrend = [...aboutUsageTrend, ...liveTrend];
+  const currentSources = usage.sources.filter((source) => source.status === "fresh").length;
+  const sourceFreshness = `${currentSources}/${usage.sources.length} sources current`;
   const usageChart = buildUsageChart(
-    aboutUsageTrend,
+    usageTrend,
     chartSize.width,
     chartSize.height,
   );
@@ -1541,22 +1582,38 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
       <div className="about-usage-body-grid">
         <div className="about-usage-total-column">
           <div className="about-usage-total-block">
-            <span className="about-usage-total">{aboutUsageSnapshot.total}</span>
+            <span className="about-usage-total">
+              {formatTokenCount(usage.totalTokens, true)}
+            </span>
             <span className="about-usage-total-caption">
-              tokens used in the past 12 months
+              captured baseline + measured activity
             </span>
           </div>
         </div>
 
         <div className="about-usage-live-card">
           <div className="about-usage-live-head">
-            <span className="about-usage-live-dot" aria-hidden="true" />
-            <span className="about-usage-live-label">Last 30d</span>
+            <span
+              className={`about-usage-live-dot is-${usage.sync.status}`}
+              aria-hidden="true"
+            />
+            <span className="about-usage-live-label">
+              {usage.observed.from
+                ? `Measured after ${formatUtcDate(usage.baseline.capturedAt)}`
+                : "Measured after snapshot"}
+            </span>
           </div>
 
           <strong className="about-usage-live-value">
-            {aboutUsageSnapshot.last30}
+            {formatTokenCount(usage.observed.tokens)}
           </strong>
+          <span className="about-usage-live-meta">
+            {usage.sync.status === "live"
+              ? `${formatSyncFreshness(usage.generatedAt, usage.sync.checkedAt, false)} · ${sourceFreshness} · partial lower bound`
+              : usage.sync.status === "stale"
+                ? `${formatSyncFreshness(usage.generatedAt, usage.sync.checkedAt, true)} · ${sourceFreshness} · partial lower bound`
+                : "Live feed offline · showing captured snapshot"}
+          </span>
         </div>
       </div>
 
@@ -1631,8 +1688,8 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
         </div>
 
         <div className="about-usage-chart-labels">
-          <span>{aboutUsageTrend[0].month}</span>
-          <span>{aboutUsageTrend[aboutUsageTrend.length - 1].month}</span>
+          <span>{usageTrend[0].month}</span>
+          <span>{usageTrend[usageTrend.length - 1].month}</span>
         </div>
       </div>
     </section>
