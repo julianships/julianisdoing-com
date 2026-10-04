@@ -189,21 +189,6 @@ function formatUtcDate(timestamp: string | null) {
   }).format(new Date(timestamp));
 }
 
-function formatSyncFreshness(timestamp: string, checkedAt: string, stale: boolean) {
-  const minutes = Math.max(
-    0,
-    Math.floor((Date.parse(checkedAt) - Date.parse(timestamp)) / 60_000),
-  );
-  const age = minutes < 1
-    ? "just now"
-    : minutes < 60
-      ? `${minutes}m ago`
-      : minutes < 1_440
-        ? `${Math.floor(minutes / 60)}h ago`
-        : `${Math.floor(minutes / 1_440)}d ago`;
-  return `${stale ? "Last sync" : "Synced"} ${age}`;
-}
-
 function buildUsageChart(
   series: readonly { month: string; cumulative: number }[],
   width: number,
@@ -1563,8 +1548,7 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
     cumulative: usage.totalTokens,
   }] : [];
   const usageTrend = [...aboutUsageTrend, ...liveTrend];
-  const currentSources = usage.sources.filter((source) => source.status === "fresh").length;
-  const sourceFreshness = `${currentSources}/${usage.sources.length} sources current`;
+
   const usageChart = buildUsageChart(
     usageTrend,
     chartSize.width,
@@ -1586,34 +1570,23 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
               {formatTokenCount(usage.totalTokens, true)}
             </span>
             <span className="about-usage-total-caption">
-              captured baseline + measured activity
+              tokens used
             </span>
           </div>
         </div>
 
         <div className="about-usage-live-card">
           <div className="about-usage-live-head">
-            <span
-              className={`about-usage-live-dot is-${usage.sync.status}`}
-              aria-hidden="true"
-            />
+            <span className="about-usage-live-dot" aria-hidden="true" />
             <span className="about-usage-live-label">
-              {usage.observed.from
-                ? `Measured after ${formatUtcDate(usage.baseline.capturedAt)}`
-                : "Measured after snapshot"}
+              {`Since ${formatUtcDate(usage.baseline.capturedAt)}`}
             </span>
           </div>
 
           <strong className="about-usage-live-value">
             {formatTokenCount(usage.observed.tokens)}
           </strong>
-          <span className="about-usage-live-meta">
-            {usage.sync.status === "live"
-              ? `${formatSyncFreshness(usage.generatedAt, usage.sync.checkedAt, false)} · ${sourceFreshness} · partial lower bound`
-              : usage.sync.status === "stale"
-                ? `${formatSyncFreshness(usage.generatedAt, usage.sync.checkedAt, true)} · ${sourceFreshness} · partial lower bound`
-                : "Live feed offline · showing captured snapshot"}
-          </span>
+
         </div>
       </div>
 
@@ -1688,7 +1661,7 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
         </div>
 
         <div className="about-usage-chart-labels">
-          <span>{usageTrend[0].month}</span>
+          <span>{`${usageTrend[0].month} ${usageTrend[0].date.slice(0, 4)}`}</span>
           <span>{usageTrend[usageTrend.length - 1].month}</span>
         </div>
       </div>
