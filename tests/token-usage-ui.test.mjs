@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 
 const source = readFileSync(new URL('../src/components/typewriter.tsx', import.meta.url), 'utf8');
 
-test('tracker keeps the original clean two-metric layout without diagnostic copy', () => {
-  assert.doesNotMatch(source, /captured baseline|Measured after|sources current|partial lower bound|Last sync|Live feed offline|about-usage-live-meta/);
-  assert.match(source, /tokens used/);
-  assert.match(source, /`Since \$\{formatUtcDate\(usage\.baseline\.capturedAt\)\}`/);
+test('tracker shows one total and a small auto-updating indicator without diagnostic copy', () => {
+  assert.equal(/captured baseline|Measured after|sources current|partial lower bound|Last sync|Live feed offline|about-usage-live-meta/.test(source), false);
+  assert.ok(source.includes('tokens used'));
+  assert.ok(source.includes('Auto-updating'));
+  assert.equal(/`Since|about-usage-live-value/.test(source), false);
   assert.match(source, /className="about-usage-live-dot"/);
 });
 
@@ -23,6 +24,6 @@ test('historical chart retains its original May 2025 start and all twelve origin
 test('clean tracker still subscribes to the feed and renders live totals and chart', () => {
   assert.match(source, /const usage = useTokenUsage\(\)/);
   assert.match(source, /formatTokenCount\(usage\.totalTokens, true\)/);
-  assert.match(source, /formatTokenCount\(usage\.observed\.tokens\)/);
+  assert.equal(source.includes('formatTokenCount(usage.observed.tokens)'), false);
   assert.match(source, /const usageTrend = \[\.\.\.aboutUsageTrend, \.\.\.liveTrend\]/);
 });
