@@ -1575,18 +1575,9 @@ function AboutUsagePanel({ compact = false }: { compact?: boolean }) {
           </div>
         </div>
 
-        <div className="about-usage-live-card">
-          <div className="about-usage-live-head">
-            <span className="about-usage-live-dot" aria-hidden="true" />
-            <span className="about-usage-live-label">
-              {`Since ${formatUtcDate(usage.baseline.capturedAt)}`}
-            </span>
-          </div>
-
-          <strong className="about-usage-live-value">
-            {formatTokenCount(usage.observed.tokens)}
-          </strong>
-
+        <div className="about-usage-live-head">
+          <span className="about-usage-live-dot" aria-hidden="true" />
+          <span className="about-usage-live-label">Auto-updating</span>
         </div>
       </div>
 
