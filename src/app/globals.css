@@ -813,12 +813,6 @@ button {
   animation: about-usage-pulse 1.9s ease-out infinite;
 }
 
-.about-usage-live-dot.is-stale,
-.about-usage-live-dot.is-offline {
-  animation: none;
-  background: rgb(245 245 247 / 0.4);
-  box-shadow: none;
-}
 
 .about-usage-live-label {
   font-size: 0.7rem;
@@ -904,7 +898,7 @@ button {
   font-size: 0.72rem;
   line-height: 1.4;
   color: rgb(245 245 247 / 0.56);
-  display: block;
+  display: none;
 }
 
 @keyframes about-usage-pulse {
